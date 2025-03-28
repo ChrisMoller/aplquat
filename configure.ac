@@ -1,7 +1,7 @@
-AC_INIT([APL matrix native functions], [2.1.0], [henrik@henrimoller.me],[mtx])
+AC_INIT([APL quaternions native functions], [1.0.0], [henrik@henrimoller.me],[aplquat])
 AC_PREFIX_DEFAULT( /usr/local )
 AC_USE_SYSTEM_EXTENSIONS
-AC_CONFIG_HEADERS([mtx_config.h])
+AC_CONFIG_HEADERS([aplquat_config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AM_MAINTAINER_MODE([enable])
@@ -23,10 +23,6 @@ AC_ARG_WITH([apl-source-dir],
   [Location of the GNU APL source code.]))
   APL_SOURCES=$with_apl_source_dir
 fi
-
-PKG_CHECK_MODULES([GSL], [gsl >= 2.8])
-AC_SUBST(GSL_CFLAGS)
-AC_SUBST(GSL_LIBS)
 
 #AC_LANG_PUSH([C++])
 #AC_CHECK_HEADER(eigen3/Eigen/Dense,

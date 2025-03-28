@@ -1,12 +1,11 @@
 
-lib_LTLIBRARIES = libmtx.la
+lib_LTLIBRARIES = libaplquat.la
 
-libmtx_la_SOURCES = mtx.cc eigens.cc Matrix.cc
-libmtx_la_CPPFLAGS = -I$(APL_SOURCES) -I$(APL_SOURCES)/src
+libaplquat_la_SOURCES = aplquat.cc Quat.cc  Quat.hh
+libaplquat_la_CPPFLAGS = -I$(APL_SOURCES) -I$(APL_SOURCES)/src
 
 noinst_LTLIBRARIES =
 
-#BUILT_SOURCES = gitversion.h
 
 .FORCE:
 

@@ -4,7 +4,7 @@
 
     mtx Copyright (C) 2024  Dr. C. H. L. Moller
 
-    This program is free software: you can redistribute it and/or modify
+compl    This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
@@ -21,10 +21,12 @@
 // https://www.microapl.com/apl_help/ch_020_030_030.htm
 // https://en.wikipedia.org/wiki/Rotation_formalisms_in_three_dimensions
 
-#include "../aplquat_config.h"
-
 #include <stdio.h>
-#include <dlfcn.h>
+
+#include "Native_interface.hh"
+#include "APL_types.hh"
+#include "Shape.hh"
+#include "Value.hh"
 
 #undef PACKAGE
 #undef PACKAGE_BUGREPORT
@@ -35,17 +37,9 @@
 #undef PACKAGE_VERSION
 #undef VERSION
 
-#include <gsl/gsl_statistics.h>
+#include "../aplquat_config.h"
 
-#include "Native_interface.hh"
-#include "APL_types.hh"
-//#include "Shape.hh"
-//#include "Value.hh"
-
-
-#ifdef HAVE_CONFIG_H
-#include "../config.h"
-#endif
+#include "Quat.hh"
 
 using namespace std;
 
@@ -99,8 +93,72 @@ eval_XB(Value_P X, Value_P B, const NativeFunction * caller)
 static Token
 eval_B(Value_P B, const NativeFunction * caller)
 {
-  Value_P X = IntScalar (0, LOC);	// default to determinant
-  return eval_XB (X, B, caller);
+  Value_P rc = Str0(LOC);
+
+  bool is_okay = false;
+  if ((B->get_cfirst ()).is_numeric () && !(*B).is_complex (true)) {
+    if (B->is_numeric_scalar()) {
+      Shape shape_Z (4);
+      rc = Value_P (shape_Z, LOC);
+      const Cell &Bv = B->get_cravel (0);
+      (*rc).set_ravel_Float (0, Bv.get_real_value ());
+      for (int i = 1; i <= 3; i++)
+	(*rc).set_ravel_Float (i, 0);
+      is_okay = true;
+    }
+    else {
+      const ShapeItem B_count = B->element_count();
+      if ((B_count >= 1) && B->get_rank () == 1) {
+	switch(B_count) {
+	case 1:
+	  {	
+	    Shape shape_Z (4);
+	    rc = Value_P (shape_Z, LOC);
+	    const Cell &Bv = B->get_cravel (0);
+	    (*rc).set_ravel_Float (0, Bv.get_real_value ());
+	    for (int i = 1; i <= 3; i++)
+	      (*rc).set_ravel_Float (i, 0);
+	    is_okay = true;
+	  }
+	  break;
+	case 3:
+	  {
+	    Shape shape_Z (4);
+	    rc = Value_P (shape_Z, LOC);
+	    (*rc).set_ravel_Float (0, 0);
+	    for (int i = 0; i < B_count; i++) {
+	      const Cell &Bv = B->get_cravel (i);
+	      (*rc).set_ravel_Float (i+1, Bv.get_real_value ());
+	    }
+	    is_okay = true;
+	  }
+	  break;
+	case 4:
+	  {
+	    Shape shape_Z (4);
+	    rc = Value_P (shape_Z, LOC);
+	    for (int i = 0; i < B_count; i++) {
+	      const Cell &Bv = B->get_cravel (i);
+	      (*rc).set_ravel_Float (i, Bv.get_real_value ());
+	    }
+	    is_okay = true;
+	  }
+	  break;
+	default:
+	  MORE_ERROR () <<
+	    "Invalid argument.  Must be length 1, 2, 3.";
+	  SYNTAX_ERROR;
+	}
+      }
+    }
+  }
+  if (!is_okay) {
+    MORE_ERROR () <<
+      "Invalid argument.  Must be real scalar or vector ⍴3 = 3.";
+    SYNTAX_ERROR;
+  }
+
+  return Token(TOK_APL_VALUE1, rc);
 }
 
 static Token

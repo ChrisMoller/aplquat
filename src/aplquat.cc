@@ -22,6 +22,8 @@ compl    This program is free software: you can redistribute it and/or modify
 // https://en.wikipedia.org/wiki/Rotation_formalisms_in_three_dimensions
 
 #include <stdio.h>
+#include <math.h>
+#include <values.h>
 
 #include "Native_interface.hh"
 #include "APL_types.hh"
@@ -168,7 +170,7 @@ eval_B(Value_P B, const NativeFunction * caller)
 	  break;
 	default:
 	  MORE_ERROR () <<
-	    "Invalid argument.  Must be length 1, 2, 3.";
+	    "Invalid vector argument.  Must be length 1, 2, 3.";
 	  SYNTAX_ERROR;
 	}
       }
@@ -176,9 +178,10 @@ eval_B(Value_P B, const NativeFunction * caller)
   }
   if (!is_okay) {
     MORE_ERROR () <<
-      "Invalid argument.  Must be real scalar or vector ⍴3 = 3.";
+      "Invalid argument.  Must be real numeric scalar or vector.";
     SYNTAX_ERROR;
   }
+  else rc->check_value(LOC);
 
   return Token(TOK_APL_VALUE1, rc);
 }
@@ -197,11 +200,45 @@ eval_AB(Value_P A, Value_P B, const NativeFunction * caller)
 {
   Value_P rc = Str0(LOC);
 
-  bool scalar_is_okay = false;
-  double scalar;
+  double scalar = NAN;
+  double vector[3] = {NAN, NAN, NAN};;
   
-  if (B->is_numeric_scalar() &&
-      !(*B).is_complex (true)) {
+  if (A->is_numeric_scalar() &&
+      !(*A).is_complex (true)) {
+    scalar = (A->get_cscalar ()).get_real_value ();
+  }
+  else {
+    MORE_ERROR () <<
+      "Invalid left argument.  Must be real scalar";
+    SYNTAX_ERROR;
+  }
+  
+  if ((B->get_cfirst ()).is_numeric () && !(*B).is_complex (true)) {
+    if (B-> get_rank () == 1 && B->element_count () == 3) {
+      for (int i = 0; i < 3; i++) {
+	vector[i] = (B->get_cravel (i)).get_real_value ();
+      }
+    }
+    else {
+      MORE_ERROR () <<
+	"Invalid right argument.  Must be a length-3 vector.";
+      SYNTAX_ERROR;
+    }
+  }
+  else {
+    MORE_ERROR () <<
+      "Invalid right argument.  Must be real numeric vector.";
+    SYNTAX_ERROR;
+  }
+
+  if (!isnan (scalar) && !isnan (vector[0])) {
+    Shape shape_Z (4);
+    rc = Value_P (shape_Z, LOC);
+    (*rc).set_ravel_Float (0, scalar);
+    for (int i = 0; i < 3; i++) {
+      (*rc).set_ravel_Float (i+1, vector[i]);
+    }
+    rc->check_value(LOC);
   }
 
   return Token(TOK_APL_VALUE1, rc);

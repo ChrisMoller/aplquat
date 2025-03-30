@@ -48,25 +48,25 @@ class NativeFunction;
 extern "C" void * get_function_mux(const char * function_name);
 
 enum {
-  OP_NONE.
-  OP_PLUS.				// dyadic +
-  OP_PLUS_ASSIGN,			// dyadic +=
-  OP_MINUS.				// dyadic -
-  OP_MINUS_ASSIGN,			// dyadic -=
-  OP_TIMES.				// dyadic *
-  OP_TIMES_ASSIGN,			// dyadic *=
-  OP_DIVIDE.				// dyadic /
-  OP_DIVIDE_ASSIGN,			// dyadic /=
-  OP_CONJUGATE,				// monadic *
-  OP_NORM,				// monadic +
-  OP_NEGATE,				// monadic -
-  OP_INVERT,				// monadic ~
-  OP_EQUAL,				// dyadic ==
-  OP_NOT_EQUAL,				// dyadic !=
-  OP_FORMAT,				// monadic 'fmt'
-  OP_DOT_PRODUCT,			// dyadic 'dot'
-  OP_CROSS_PRODUCT,			// dyadic 'cross'
-  OP_INTERANGLE				// dyadic 'ang'
+  OP_NONE,				//  0
+  OP_PLUS,				//  1 dyadic +
+  OP_PLUS_ASSIGN,			//  2 dyadic +=
+  OP_MINUS,				//  3 dyadic -
+  OP_MINUS_ASSIGN,			//  4 dyadic -=
+  OP_TIMES,				//  5 dyadic *
+  OP_TIMES_ASSIGN,			//  6 dyadic *=
+  OP_DIVIDE,				//  7 dyadic /
+  OP_DIVIDE_ASSIGN,			//  8 dyadic /=
+  OP_CONJUGATE,				//  9 monadic *
+  OP_NORM,				// 10 monadic +
+  OP_NEGATE,				// 11 monadic -
+  OP_INVERT,				// 12 monadic ~
+  OP_EQUAL,				// 13 dyadic ==
+  OP_NOT_EQUAL,				// 14 dyadic !=
+  OP_FORMAT,				// 15 monadic 'fmt'
+  OP_DOT_PRODUCT,			// 16 dyadic 'dot'
+  OP_CROSS_PRODUCT,			// 17 dyadic 'cross'
+  OP_INTERANGLE				// 18 dyadic 'ang'
 };
 
 static bool
@@ -122,7 +122,7 @@ eval_B(Value_P B, const NativeFunction * caller)
     if (B->is_numeric_scalar()) {
       Shape shape_Z (4);
       rc = Value_P (shape_Z, LOC);
-      const Cell &Bv = B->get_cravel (0);
+      const Cell &Bv = B->get_cscalar ();
       (*rc).set_ravel_Float (0, Bv.get_real_value ());
       for (int i = 1; i <= 3; i++)
 	(*rc).set_ravel_Float (i, 0);
@@ -195,8 +195,16 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
 static Token
 eval_AB(Value_P A, Value_P B, const NativeFunction * caller)
 {
-  Value_P X = IntScalar (0, LOC);	// default to determinant
-  return eval_AXB (A, X, B, caller);
+  Value_P rc = Str0(LOC);
+
+  bool scalar_is_okay = false;
+  double scalar;
+  
+  if (B->is_numeric_scalar() &&
+      !(*B).is_complex (true)) {
+  }
+
+  return Token(TOK_APL_VALUE1, rc);
 }
 
 void *

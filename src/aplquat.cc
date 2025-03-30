@@ -47,6 +47,28 @@ class NativeFunction;
 
 extern "C" void * get_function_mux(const char * function_name);
 
+enum {
+  OP_NONE.
+  OP_PLUS.				// dyadic +
+  OP_PLUS_ASSIGN,			// dyadic +=
+  OP_MINUS.				// dyadic -
+  OP_MINUS_ASSIGN,			// dyadic -=
+  OP_TIMES.				// dyadic *
+  OP_TIMES_ASSIGN,			// dyadic *=
+  OP_DIVIDE.				// dyadic /
+  OP_DIVIDE_ASSIGN,			// dyadic /=
+  OP_CONJUGATE,				// monadic *
+  OP_NORM,				// monadic +
+  OP_NEGATE,				// monadic -
+  OP_INVERT,				// monadic ~
+  OP_EQUAL,				// dyadic ==
+  OP_NOT_EQUAL,				// dyadic !=
+  OP_FORMAT,				// monadic 'fmt'
+  OP_DOT_PRODUCT,			// dyadic 'dot'
+  OP_CROSS_PRODUCT,			// dyadic 'cross'
+  OP_INTERANGLE				// dyadic 'ang'
+};
+
 static bool
 close_fun(Cause cause, const NativeFunction * caller)
 {

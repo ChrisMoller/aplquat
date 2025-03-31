@@ -7,15 +7,21 @@ common_LDFLAGS += -export-dynamic
 
 lib_LTLIBRARIES = libaplquat.la
 
-libaplquat_la_SOURCES = aplquat.cc Quat.cc  Quat.hh
+libaplquat_la_SOURCES = aplquat.cc Quat.cc  Quat.hh kwds.h
 libaplquat_la_CPPFLAGS = -I$(APL_SOURCES) -I$(APL_SOURCES)/src
 libaplquat_la_CXXFLAGS = $(AM_CXXFLAGS)
 libaplquat_la_LDFLAGS = $(common_LDFLAGS)
 
+BUILT_SOURCES = kwds.h
+CLEANFILES = kwds.h
 
 noinst_LTLIBRARIES =
 
+EXTRA_DIST = kwds.m4
 
+
+kwds.h: kwds.m4
+	m4 $^ >$@
 
 .FORCE:
 

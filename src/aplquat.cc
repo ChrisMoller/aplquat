@@ -24,6 +24,9 @@ compl    This program is free software: you can redistribute it and/or modify
 #include <stdio.h>
 #include <math.h>
 #include <values.h>
+#include <search.h>
+#include <strings.h>
+
 
 #include "Native_interface.hh"
 #include "APL_types.hh"
@@ -49,27 +52,15 @@ class NativeFunction;
 
 extern "C" void * get_function_mux(const char * function_name);
 
-enum {
-  OP_NONE,				//  0
-  OP_PLUS,				//  1 dyadic +
-  OP_PLUS_ASSIGN,			//  2 dyadic +=
-  OP_MINUS,				//  3 dyadic -
-  OP_MINUS_ASSIGN,			//  4 dyadic -=
-  OP_TIMES,				//  5 dyadic *
-  OP_TIMES_ASSIGN,			//  6 dyadic *=
-  OP_DIVIDE,				//  7 dyadic /
-  OP_DIVIDE_ASSIGN,			//  8 dyadic /=
-  OP_CONJUGATE,				//  9 monadic *
-  OP_NORM,				// 10 monadic +
-  OP_NEGATE,				// 11 monadic -
-  OP_INVERT,				// 12 monadic ~
-  OP_EQUAL,				// 13 dyadic ==
-  OP_NOT_EQUAL,				// 14 dyadic !=
-  OP_FORMAT,				// 15 monadic 'fmt'
-  OP_DOT_PRODUCT,			// 16 dyadic 'dot'
-  OP_CROSS_PRODUCT,			// 17 dyadic 'cross'
-  OP_INTERANGLE				// 18 dyadic 'ang'
-};
+#include "kwds.h"
+typedef struct {
+  const char *key;
+  void *loc;
+} dictionary_ety_s;
+dictionary_ety_s *dictionary = NULL;
+int dictionary_max = 0;
+int dictionary_nxt = 0;
+#define DICTIONARY_INCR 64
 
 static bool
 close_fun(Cause cause, const NativeFunction * caller)
@@ -192,6 +183,17 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
 {
   Value_P rc = Str0(LOC);
 
+  int op = OP_NONE;
+  
+  if (X->is_numeric_scalar () &&
+      !(*X).is_complex (true)) {
+    op = (*X).get_sole_integer ();
+    cout << "num = " << op << endl;
+  }
+  else if (X->is_char_array()) {
+    cout << "cha\n";
+  }
+
   return Token(TOK_APL_VALUE1, rc);
 }
 
@@ -244,9 +246,88 @@ eval_AB(Value_P A, Value_P B, const NativeFunction * caller)
   return Token(TOK_APL_VALUE1, rc);
 }
 
+static int
+dictionary_insert_compare (const void *a, const void *b)
+{
+  const char *av = (*(dictionary_ety_s *)a).key;
+  const char *bv = (*(dictionary_ety_s *)b).key;
+  return strcasecmp (av, bv);
+}
+
+static int
+dictionary_search_compare (const void *a, const void *b)
+{
+  const char *av = (char *)a;
+  const char *bv = (*(dictionary_ety_s *)b).key;
+  return strcasecmp (av, bv);
+}
+
+static keyword_s *
+lookup_kwd (const char *kwd)
+{
+  keyword_s *op_data = NULL;
+  void *res = bsearch (kwd, dictionary, dictionary_nxt,
+			sizeof (dictionary_ety_s), dictionary_search_compare);
+  if (res) {
+    dictionary_ety_s *ety = (dictionary_ety_s *)res;
+    op_data = ((keyword_s*)(ety->loc));
+  }
+  return op_data;
+}
+
 void *
 get_function_mux(const char * function_name)
 {
+  static bool dict_initialised = false;
+
+  if (!dict_initialised) {
+    dict_initialised = true;
+    for (int i = 0; i < nr_keys; i++) {
+      if (dictionary_max <= 3 + dictionary_nxt) {
+	dictionary_max += DICTIONARY_INCR;
+	dictionary =
+	  (dictionary_ety_s *)realloc (dictionary,
+				       dictionary_max *
+				       sizeof (dictionary_ety_s));
+      }
+      dictionary[dictionary_nxt].key = keywords[i].keyword;
+      dictionary[dictionary_nxt++].loc = &keywords[i];
+      dictionary[dictionary_nxt].key = keywords[i].abbr;
+      dictionary[dictionary_nxt++].loc = &keywords[i];
+      dictionary[dictionary_nxt].key = keywords[i].symbol;
+      dictionary[dictionary_nxt++].loc = &keywords[i];
+    }
+    qsort (dictionary, dictionary_nxt, sizeof (dictionary_ety_s),
+	   dictionary_insert_compare);
+#if 0
+    keyword_s *fnd;
+    fnd = lookup_kwd ("format");
+    if (fnd) {
+      fprintf (stderr, "found %s\n", fnd->keyword);
+      fprintf (stderr, "found %d\n", fnd->opcode);
+      fprintf (stderr, "found %s\n", fnd->abbr);
+    }
+    else fprintf (stderr, "not found\n");
+    
+    fnd = lookup_kwd ("fmt");
+    if (fnd) {
+      fprintf (stderr, "found %s\n", fnd->keyword);
+      fprintf (stderr, "found %d\n", fnd->opcode);
+      fprintf (stderr, "found %s\n", fnd->abbr);
+    }
+    else fprintf (stderr, "not found\n");
+    
+    fnd = lookup_kwd ("⍕");
+    if (fnd) {
+      fprintf (stderr, "found %s\n", fnd->keyword);
+      fprintf (stderr, "found %d\n", fnd->opcode);
+      fprintf (stderr, "found %s\n", fnd->abbr);
+    }
+    else fprintf (stderr, "not found\n");
+#endif
+  }
+
+  
   // mandatory
   if (!strcmp(function_name, "get_signature"))
     return reinterpret_cast<void *>(&get_signature);

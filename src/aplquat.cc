@@ -83,6 +83,38 @@ lookup_kwd (const char *kwd)
   return op_data;
 }
 
+static void
+quatify (double *vec, Value_P V)
+{
+  bool rc = false;
+  for (int i = 0; i < 4; i++) {
+    vec[i] = (V->get_cravel (i)).get_real_value ();
+  }
+}
+
+static bool
+is_quat (Value_P V)
+{
+  bool rc = false;
+
+  if ((V->get_cfirst ()).is_numeric () && !(*V).is_complex (true)) {
+    if (V->get_rank () == 1 && V->element_count () == 4)
+      rc = true;
+    else {
+      MORE_ERROR () <<
+	"Invalid argument.  Must be a quaternion";
+      SYNTAX_ERROR;
+    }
+  }
+  else {
+    MORE_ERROR () <<
+      "Invalid argument.  Must be a real numeric vector.";
+    SYNTAX_ERROR;
+  }
+  
+  return rc;
+}
+
 static bool
 close_fun(Cause cause, const NativeFunction * caller)
 {
@@ -118,11 +150,150 @@ eval_ident_Bx(Value_P B, sAxis x)
   return Token(TOK_APL_VALUE1, Str0(LOC));
 }
 
+static Value_P
+do_norm (Value_P B)
+{
+  Value_P rc = Str0(LOC);
+
+  if (is_quat (B)) {
+    double Bv[4];
+    quatify (Bv, B);
+    Quat Bq (Bv);
+
+    double S = +Bq;
+    rc = FloatScalar ((int)S, LOC);
+  }
+
+  return rc;  
+}
+
+static Value_P
+do_negate (Value_P B)
+{
+  Value_P rc = Str0(LOC);
+
+  if (is_quat (B)) {
+    double Bv[4];
+    quatify (Bv, B);
+    Quat Bq (Bv);
+
+    Quat S = -Bq;
+    double *v = S.qvec ();
+    
+    Shape shape_Z (4);
+    rc = Value_P (shape_Z, LOC);
+    for (int i = 0; i < 4; i++) {
+      (*rc).set_ravel_Float (i, v[i]);
+    }
+  }
+
+  return rc;  
+}
+
+static Value_P
+do_conjugate (Value_P B)
+{
+  Value_P rc = Str0(LOC);
+
+  if (is_quat (B)) {
+    double Bv[4];
+    quatify (Bv, B);
+    Quat Bq (Bv);
+
+    Quat S = *Bq;
+    double *v = S.qvec ();
+    
+    Shape shape_Z (4);
+    rc = Value_P (shape_Z, LOC);
+    for (int i = 0; i < 4; i++) {
+      (*rc).set_ravel_Float (i, v[i]);
+    }
+  }
+
+  return rc;  
+}
+
+static Value_P
+do_invert (Value_P B)
+{
+  Value_P rc = Str0(LOC);
+
+  if (is_quat (B)) {
+    double Bv[4];
+    quatify (Bv, B);
+    Quat Bq (Bv);
+
+    Quat S = ~Bq;
+    double *v = S.qvec ();
+    
+    Shape shape_Z (4);
+    rc = Value_P (shape_Z, LOC);
+    for (int i = 0; i < 4; i++) {
+      (*rc).set_ravel_Float (i, v[i]);
+    }
+  }
+
+  return rc;  
+}
+
 static Token
 eval_XB(Value_P X, Value_P B, const NativeFunction * caller)
 {
   Value_P rc = Str0(LOC);
 
+  int op = OP_NONE;
+  
+  if (X->is_numeric_scalar () &&
+      !(*X).is_complex (true)) {
+    op = (*X).get_sole_integer ();
+    cout << "num = " << op << endl;
+  }
+  else if (X->is_char_array()) {
+    const UCS_string  ustr = X->get_UCS_ravel();
+    UTF8_string which (ustr);
+    keyword_s *fnd = lookup_kwd (which.c_str ());
+    if (fnd) {
+      switch (fnd->opcode) {
+      case OP_PLUS:
+      case OP_NORM:
+	rc = do_norm (B);
+	break;
+      case OP_NEGATE:
+      case OP_MINUS:
+	rc = do_negate (B);
+	break;
+      case OP_CONJUGATE:
+      case OP_TIMES:
+	rc = do_conjugate (B);
+	break;
+      case OP_INVERT:
+	rc = do_invert (B);
+	break;
+      case OP_EQUAL:
+      case OP_NOT_EQUAL: 
+      case OP_DOT_PRODUCT:
+      case OP_CROSS_PRODUCT:
+      case OP_INTERANGLE:
+      case OP_XFORM:
+      case OP_PLUS_ASSIGN:
+      case OP_MINUS_ASSIGN:
+      case OP_TIMES_ASSIGN:
+      case OP_DIVIDE_ASSIGN:
+      case OP_FORMAT:
+	MORE_ERROR () <<
+	  "No monadic use of operator: " << which.c_str ();
+	SYNTAX_ERROR;
+	break;
+      }
+    }
+    else {
+      MORE_ERROR () <<
+	"Unknown operator: " << which.c_str ();
+      SYNTAX_ERROR;
+    }
+  }
+
+  rc->check_value(LOC);
   return Token(TOK_APL_VALUE1, rc);
 }
 
@@ -196,38 +367,6 @@ eval_B(Value_P B, const NativeFunction * caller)
   else rc->check_value(LOC);
 
   return Token(TOK_APL_VALUE1, rc);
-}
-
-static bool
-is_quat (Value_P V)
-{
-  bool rc = false;
-
-  if ((V->get_cfirst ()).is_numeric () && !(*V).is_complex (true)) {
-    if (V->get_rank () == 1 && V->element_count () == 4)
-      rc = true;
-    else {
-      MORE_ERROR () <<
-	"Invalid argument.  Must be a quaternion";
-      SYNTAX_ERROR;
-    }
-  }
-  else {
-    MORE_ERROR () <<
-      "Invalid argument.  Must be a real numeric vector.";
-    SYNTAX_ERROR;
-  }
-  
-  return rc;
-}
-
-static void
-quatify (double *vec, Value_P V)
-{
-  bool rc = false;
-  for (int i = 0; i < 4; i++) {
-    vec[i] = (V->get_cravel (i)).get_real_value ();
-  }
 }
 
 static Value_P
@@ -496,6 +635,7 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
     if (fnd) {
       switch (fnd->opcode) {
       case OP_PLUS:
+      case OP_NORM:
 	rc = do_plus (A, B);
 	break;
       case OP_NEGATE:
@@ -531,7 +671,6 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
       case OP_MINUS_ASSIGN:
       case OP_TIMES_ASSIGN:
       case OP_DIVIDE_ASSIGN:
-      case OP_NORM:
       case OP_INVERT:
       case OP_FORMAT:
 	MORE_ERROR () <<

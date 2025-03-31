@@ -198,6 +198,65 @@ eval_B(Value_P B, const NativeFunction * caller)
   return Token(TOK_APL_VALUE1, rc);
 }
 
+static bool
+is_quat (Value_P V)
+{
+  bool rc = false;
+
+  if ((V->get_cfirst ()).is_numeric () && !(*V).is_complex (true)) {
+    if (V->get_rank () == 1 && V->element_count () == 4)
+      rc = true;
+    else {
+      MORE_ERROR () <<
+	"Invalid argument.  Must be a quaternion";
+      SYNTAX_ERROR;
+    }
+  }
+  else {
+    MORE_ERROR () <<
+      "Invalid argument.  Must be a real numeric vector.";
+    SYNTAX_ERROR;
+  }
+  
+  return rc;
+}
+
+static void
+quatify (double *vec, Value_P V)
+{
+  bool rc = false;
+  for (int i = 0; i < 4; i++) {
+    vec[i] = (V->get_cravel (i)).get_real_value ();
+  }
+}
+
+static Value_P
+do_plus (Value_P A, Value_P B)
+{
+  Value_P rc = Str0(LOC);
+
+  if (is_quat (A) && is_quat (B)) {
+    double Av[4];
+    quatify (Av, A);
+    Quat Aq (Av);
+    
+    double Bv[4];
+    quatify (Bv, B);
+    Quat Bq (Bv);
+
+    Quat S = Aq + Bq;
+    double *v = S.qvec ();
+    
+    Shape shape_Z (4);
+    rc = Value_P (shape_Z, LOC);
+    for (int i = 0; i < 4; i++) {
+      (*rc).set_ravel_Float (i, v[i]);
+    }
+  }
+
+  return rc;  
+}
+
 static Token
 eval_AXB(Value_P A, Value_P X, Value_P B,
 	 const NativeFunction * caller)
@@ -218,6 +277,7 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
     if (fnd) {
       switch (fnd->opcode) {
       case OP_PLUS:
+	rc = do_plus (A, B);
 	break;
       case OP_PLUS_ASSIGN:
       case OP_MINUS:
@@ -236,11 +296,13 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
       case OP_DOT_PRODUCT:
       case OP_CROSS_PRODUCT:
       case OP_INTERANGLE:
+      case OP_XFORM:
 	break;
       }
     }
   }
 
+  rc->check_value(LOC);
   return Token(TOK_APL_VALUE1, rc);
 }
 
@@ -263,7 +325,7 @@ eval_AB(Value_P A, Value_P B, const NativeFunction * caller)
   }
   
   if ((B->get_cfirst ()).is_numeric () && !(*B).is_complex (true)) {
-    if (B-> get_rank () == 1 && B->element_count () == 3) {
+    if (B->get_rank () == 1 && B->element_count () == 3) {
       for (int i = 0; i < 3; i++) {
 	vector[i] = (B->get_cravel (i)).get_real_value ();
       }

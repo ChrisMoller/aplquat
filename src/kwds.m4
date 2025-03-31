@@ -37,6 +37,7 @@ entry(format,        "fmt",   "⍕",  "Format")
 entry(dot_product,   "dot",   "∘",  "Dot product")
 entry(cross_product, "cross", "○",  "Cross product")
 entry(interangle,    "ang",   "<",  "Internal angle")
+entry(xform,         "xform", "><", "Transform")
 
 `typedef struct {
   const char *keyword;

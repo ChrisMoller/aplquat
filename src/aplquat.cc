@@ -225,7 +225,7 @@ do_invert (Value_P B)
 
     Quat S = ~Bq;
     double *v = S.qvec ();
-    
+
     Shape shape_Z (4);
     rc = Value_P (shape_Z, LOC);
     for (int i = 0; i < 4; i++) {
@@ -267,6 +267,7 @@ eval_XB(Value_P X, Value_P B, const NativeFunction * caller)
 	rc = do_conjugate (B);
 	break;
       case OP_INVERT:
+      case OP_DIVIDE:
 	rc = do_invert (B);
 	break;
       case OP_EQUAL:

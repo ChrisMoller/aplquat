@@ -443,7 +443,7 @@ do_ang (Value_P A, Value_P B)
     Quat Bq (Bv);
 
     double S = Aq.qang (Bq);
-    rc = FloatScalar ((int)S, LOC);
+    rc = FloatScalar (S, LOC);
   }
 
   return rc;  

@@ -62,6 +62,27 @@ int dictionary_max = 0;
 int dictionary_nxt = 0;
 #define DICTIONARY_INCR 64
 
+static int
+dictionary_search_compare (const void *a, const void *b)
+{
+  const char *av = (char *)a;
+  const char *bv = (*(dictionary_ety_s *)b).key;
+  return strcasecmp (av, bv);
+}
+
+static keyword_s *
+lookup_kwd (const char *kwd)
+{
+  keyword_s *op_data = NULL;
+  void *res = bsearch (kwd, dictionary, dictionary_nxt,
+			sizeof (dictionary_ety_s), dictionary_search_compare);
+  if (res) {
+    dictionary_ety_s *ety = (dictionary_ety_s *)res;
+    op_data = ((keyword_s*)(ety->loc));
+  }
+  return op_data;
+}
+
 static bool
 close_fun(Cause cause, const NativeFunction * caller)
 {
@@ -191,7 +212,33 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
     cout << "num = " << op << endl;
   }
   else if (X->is_char_array()) {
-    cout << "cha\n";
+    const UCS_string  ustr = X->get_UCS_ravel();
+    UTF8_string which (ustr);
+    keyword_s *fnd = lookup_kwd (which.c_str ());
+    if (fnd) {
+      switch (fnd->opcode) {
+      case OP_PLUS:
+	break;
+      case OP_PLUS_ASSIGN:
+      case OP_MINUS:
+      case OP_MINUS_ASSIGN:
+      case OP_TIMES:
+      case OP_TIMES_ASSIGN:
+      case OP_DIVIDE:
+      case OP_DIVIDE_ASSIGN:
+      case OP_CONJUGATE:
+      case OP_NORM:
+      case OP_NEGATE:
+      case OP_INVERT:
+      case OP_EQUAL:
+      case OP_NOT_EQUAL: 
+      case OP_FORMAT:
+      case OP_DOT_PRODUCT:
+      case OP_CROSS_PRODUCT:
+      case OP_INTERANGLE:
+	break;
+      }
+    }
   }
 
   return Token(TOK_APL_VALUE1, rc);
@@ -252,27 +299,6 @@ dictionary_insert_compare (const void *a, const void *b)
   const char *av = (*(dictionary_ety_s *)a).key;
   const char *bv = (*(dictionary_ety_s *)b).key;
   return strcasecmp (av, bv);
-}
-
-static int
-dictionary_search_compare (const void *a, const void *b)
-{
-  const char *av = (char *)a;
-  const char *bv = (*(dictionary_ety_s *)b).key;
-  return strcasecmp (av, bv);
-}
-
-static keyword_s *
-lookup_kwd (const char *kwd)
-{
-  keyword_s *op_data = NULL;
-  void *res = bsearch (kwd, dictionary, dictionary_nxt,
-			sizeof (dictionary_ety_s), dictionary_search_compare);
-  if (res) {
-    dictionary_ety_s *ety = (dictionary_ety_s *)res;
-    op_data = ((keyword_s*)(ety->loc));
-  }
-  return op_data;
 }
 
 void *

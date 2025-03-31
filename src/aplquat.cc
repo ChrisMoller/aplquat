@@ -380,6 +380,102 @@ do_not_equal (Value_P A, Value_P B)
   return rc;  
 }
 
+static Value_P
+do_dot (Value_P A, Value_P B)
+{
+  Value_P rc = Str0(LOC);
+
+  if (is_quat (A) && is_quat (B)) {
+    double Av[4];
+    quatify (Av, A);
+    Quat Aq (Av);
+    
+    double Bv[4];
+    quatify (Bv, B);
+    Quat Bq (Bv);
+
+    double S = Aq.qdot (Bq);
+    rc = FloatScalar ((int)S, LOC);
+  }
+
+  return rc;  
+}
+
+static Value_P
+do_cross (Value_P A, Value_P B)
+{
+  Value_P rc = Str0(LOC);
+
+  if (is_quat (A) && is_quat (B)) {
+    double Av[4];
+    quatify (Av, A);
+    Quat Aq (Av);
+    
+    double Bv[4];
+    quatify (Bv, B);
+    Quat Bq (Bv);
+
+    Quat S = Aq.qcross (Bq);
+    double *v = S.qvec ();
+
+    Shape shape_Z (4);
+    rc = Value_P (shape_Z, LOC);
+    for (int i = 0; i < 4; i++) {
+      (*rc).set_ravel_Float (i, v[i]);
+    }
+  }
+
+  return rc;  
+}
+
+static Value_P
+do_ang (Value_P A, Value_P B)
+{
+  Value_P rc = Str0(LOC);
+
+  if (is_quat (A) && is_quat (B)) {
+    double Av[4];
+    quatify (Av, A);
+    Quat Aq (Av);
+    
+    double Bv[4];
+    quatify (Bv, B);
+    Quat Bq (Bv);
+
+    double S = Aq.qang (Bq);
+    rc = FloatScalar ((int)S, LOC);
+  }
+
+  return rc;  
+}
+
+static Value_P
+do_xform (Value_P A, Value_P B)
+{
+  Value_P rc = Str0(LOC);
+
+  if (is_quat (A) && is_quat (B)) {
+    double Av[4];
+    quatify (Av, A);
+    Quat Aq (Av);
+    
+    double Bv[4];
+    quatify (Bv, B);
+    Quat Bq (Bv);
+
+    Quat S = Aq.qxform (Bq);
+    double *v = S.qvec ();
+
+    Shape shape_Z (4);
+    rc = Value_P (shape_Z, LOC);
+    for (int i = 0; i < 4; i++) {
+      (*rc).set_ravel_Float (i, v[i]);
+    }
+  }
+
+  return rc;  
+}
+
 static Token
 eval_AXB(Value_P A, Value_P X, Value_P B,
 	 const NativeFunction * caller)
@@ -397,7 +493,6 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
     const UCS_string  ustr = X->get_UCS_ravel();
     UTF8_string which (ustr);
     keyword_s *fnd = lookup_kwd (which.c_str ());
-    cout << "fnd = " << fnd << endl;
     if (fnd) {
       switch (fnd->opcode) {
       case OP_PLUS:
@@ -420,20 +515,35 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
       case OP_NOT_EQUAL: 
 	rc = do_not_equal (A, B);
 	break;
+      case OP_DOT_PRODUCT:
+	rc = do_dot (A, B);
+	break;
+      case OP_CROSS_PRODUCT:
+	rc = do_cross (A, B);
+	break;
+      case OP_INTERANGLE:
+	rc = do_ang (A, B);
+	break;
+      case OP_XFORM:
+	rc = do_xform (A, B);
+	break;
       case OP_PLUS_ASSIGN:
       case OP_MINUS_ASSIGN:
       case OP_TIMES_ASSIGN:
       case OP_DIVIDE_ASSIGN:
       case OP_NORM:
-      case OP_NEGATE:
       case OP_INVERT:
       case OP_FORMAT:
-      case OP_DOT_PRODUCT:
-      case OP_CROSS_PRODUCT:
-      case OP_INTERANGLE:
-      case OP_XFORM:
+	MORE_ERROR () <<
+	  "No dyadic use of operator: " << which.c_str ();
+	SYNTAX_ERROR;
 	break;
       }
+    }
+    else {
+      MORE_ERROR () <<
+	"Unknown operator: " << which.c_str ();
+      SYNTAX_ERROR;
     }
   }
 
@@ -522,7 +632,12 @@ get_function_mux(const char * function_name)
     }
     qsort (dictionary, dictionary_nxt, sizeof (dictionary_ety_s),
 	   dictionary_insert_compare);
+
 #if 0
+    for (int i = 0; i < dictionary_nxt++; i++) {
+      dictionary_ety_s *ety = &dictionary[i];
+      fprintf (stderr, "ety \"%s\"\n", ety->key);
+    }
     keyword_s *fnd;
     fnd = lookup_kwd ("format");
     if (fnd) {

@@ -34,10 +34,10 @@ the quaternion extension has been loaded with
 
 the operations can be invoked in any of three forms such as:
 
--a quat[1] b
--a quat['pl'] b
--a quat['+'] b
--a quat['plus'] b
+- a quat[1] b
+- a quat['pl'] b
+- a quat['+'] b
+- a quat['plus'] b
 
 
 #### Dyadic

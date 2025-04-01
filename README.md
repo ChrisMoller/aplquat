@@ -39,7 +39,7 @@ the operations can be invoked in any of three forms such as:
 - quat['+']
 - quat['plus']
 
-all of which result in addition.
+all of which result in addition.  (Use anything you like instead of 'quat'.)
 
 
 

@@ -9,7 +9,7 @@ interpretation, quaternions are more akin to a spherical coordinate system.
 
 Quaternions are represented by a 4-element vector:
 
-&nbsp;&nbsp;&nbsp;&nbsp;[*s* $a_0$**i** $a_1$**j** $a_2$**k**]
+&nbsp;&nbsp;&nbsp;&nbsp;[ $s$ $a_0$**i** $a_1$**j** $a_2$**k**]
 
 
 

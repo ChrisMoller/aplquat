@@ -6,9 +6,9 @@ define(`offset', 0)dnl
 define(`cnt',    offset)dnl
 define(`xinc', `define(`$1',incr($1))')dnl
 define(`upcase', `translit($1, `a-z', `A-Z')')dnl
-define(`entry', ``#'define `KEYWORD_'upcase($1) "$1"
-`#'define `OP_'upcase($1) cnt xinc(`cnt')
-divert(1)  `{' `KEYWORD_'upcase($1), `OP_'upcase($1), $2, $3, $4 `},'
+define(`entry', ``#'define `OPERATION_'upcase($1) "$1"
+`#'define `OPCODE_'upcase($1) cnt xinc(`cnt')
+divert(1)  `{' `OPERATION_'upcase($1), `OPCODE_'upcase($1), $2, $3, $4 `},'
 divert(0)'
 )dnl
 
@@ -20,13 +20,13 @@ divert(0)'
 
 entry(none,	     "",      "⍬",  "No-op")
 entry(plus, 	     "pl",    "+",  "Addition")
-entry(plus_assign,   "pa",    "+=", "Add-assign")
+dnl entry(plus_assign,   "pa",    "+=", "Add-assign")
 entry(minus,	     "mi",    "-",  "Subtraction")
-entry(minus_assign,  "pa",    "-=", "Subtraction-assign")
+dnl entry(minus_assign,  "pa",    "-=", "Subtraction-assign")
 entry(times,	     "ti",    "×",  "Multiplication")
-entry(times_assign,  "ta",    "×=", "Multiplication-assign")
+dnl entry(times_assign,  "ta",    "×=", "Multiplication-assign")
 entry(divide,        "di",    "÷",  "Division")
-entry(divide_assign, "da",    "÷=", "Division-assign")
+dnl entry(divide_assign, "da",    "÷=", "Division-assign")
 entry(conjugate,     "co",    "*",  "Conjugation")
 entry(norm,          "no",    "+",  "Norm (magnitude)")
 entry(negate,        "neg",   "-",  "Negate")
@@ -45,10 +45,10 @@ entry(xform,         "xform", "><", "Transform")
   const char *abbr;
   const char *symbol;
   const char *desc;
-} keyword_s;
+} operation_s;
 
-keyword_s keywords[] = {'
+operation_s operations[] = {'
 undivert
 `};
-int nr_keys =' eval(cnt - offset)`;'
+int nr_operations =' eval(cnt - offset)`;'
 #endif /* KWDS_H*/

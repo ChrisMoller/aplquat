@@ -70,15 +70,15 @@ dictionary_search_compare (const void *a, const void *b)
   return strcasecmp (av, bv);
 }
 
-static keyword_s *
+static operation_s *
 lookup_kwd (const char *kwd)
 {
-  keyword_s *op_data = NULL;
+  operation_s *op_data = NULL;
   void *res = bsearch (kwd, dictionary, dictionary_nxt,
 			sizeof (dictionary_ety_s), dictionary_search_compare);
   if (res) {
     dictionary_ety_s *ety = (dictionary_ety_s *)res;
-    op_data = ((keyword_s*)(ety->loc));
+    op_data = ((operation_s*)(ety->loc));
   }
   return op_data;
 }
@@ -241,7 +241,7 @@ eval_XB(Value_P X, Value_P B, const NativeFunction * caller)
 {
   Value_P rc = Str0(LOC);
 
-  int op = OP_NONE;
+  int op = OPCODE_NONE;
   
   if (X->is_numeric_scalar () &&
       !(*X).is_complex (true)) {
@@ -251,36 +251,38 @@ eval_XB(Value_P X, Value_P B, const NativeFunction * caller)
   else if (X->is_char_array()) {
     const UCS_string  ustr = X->get_UCS_ravel();
     UTF8_string which (ustr);
-    keyword_s *fnd = lookup_kwd (which.c_str ());
+    operation_s *fnd = lookup_kwd (which.c_str ());
     if (fnd) {
       switch (fnd->opcode) {
-      case OP_PLUS:
-      case OP_NORM:
+      case OPCODE_PLUS:
+      case OPCODE_NORM:
 	rc = do_norm (B);
 	break;
-      case OP_NEGATE:
-      case OP_MINUS:
+      case OPCODE_NEGATE:
+      case OPCODE_MINUS:
 	rc = do_negate (B);
 	break;
-      case OP_CONJUGATE:
-      case OP_TIMES:
+      case OPCODE_CONJUGATE:
+      case OPCODE_TIMES:
 	rc = do_conjugate (B);
 	break;
-      case OP_INVERT:
-      case OP_DIVIDE:
+      case OPCODE_INVERT:
+      case OPCODE_DIVIDE:
 	rc = do_invert (B);
 	break;
-      case OP_EQUAL:
-      case OP_NOT_EQUAL: 
-      case OP_DOT_PRODUCT:
-      case OP_CROSS_PRODUCT:
-      case OP_INTERANGLE:
-      case OP_XFORM:
-      case OP_PLUS_ASSIGN:
-      case OP_MINUS_ASSIGN:
-      case OP_TIMES_ASSIGN:
-      case OP_DIVIDE_ASSIGN:
-      case OP_FORMAT:
+      case OPCODE_EQUAL:
+      case OPCODE_NOT_EQUAL: 
+      case OPCODE_DOT_PRODUCT:
+      case OPCODE_CROSS_PRODUCT:
+      case OPCODE_INTERANGLE:
+      case OPCODE_XFORM:
+      case OPCODE_FORMAT:
+#if 0
+      case OPCODE_PLUS_ASSIGN:
+      case OPCODE_MINUS_ASSIGN:
+      case OPCODE_TIMES_ASSIGN:
+      case OPCODE_DIVIDE_ASSIGN:
+#endif
 	MORE_ERROR () <<
 	  "No monadic use of operator: " << which.c_str ();
 	SYNTAX_ERROR;
@@ -361,9 +363,35 @@ eval_B(Value_P B, const NativeFunction * caller)
     }
   }
   if (!is_okay) {
+#if 1
+    int prev_opcode = -1;
+    for (int i = 1; i < dictionary_nxt; i++) {
+      dictionary_ety_s *ety = &dictionary[i];
+      operation_s *operation = (operation_s*)(ety->loc);
+      if (operation->opcode != OPCODE_NONE &&
+	  operation->opcode != prev_opcode) {
+	int padding = 16 - strlen (operation->keyword);
+	//                 c   a   s    k
+	fprintf (stderr, "%d\t'%s'\t'%s'\t'%s'%*s%s\n",
+		 operation->opcode,
+		 operation->abbr,
+		 operation->symbol,
+		 operation->keyword,
+		 padding,
+		 " ",
+		 operation->desc
+		 );
+	prev_opcode = operation->opcode;
+      }
+    }
+    fprintf (stderr,
+	     "\nUse any of the first four columns as the index value \
+to get the\ncorresponding operation.\n");
+#else
     MORE_ERROR () <<
       "Invalid argument.  Must be real numeric scalar or vector.";
     SYNTAX_ERROR;
+#endif
   }
   else rc->check_value(LOC);
 
@@ -622,7 +650,7 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
 {
   Value_P rc = Str0(LOC);
 
-  int op = OP_NONE;
+  int op = OPCODE_NONE;
   
   if (X->is_numeric_scalar () &&
       !(*X).is_complex (true)) {
@@ -632,48 +660,50 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
   else if (X->is_char_array()) {
     const UCS_string  ustr = X->get_UCS_ravel();
     UTF8_string which (ustr);
-    keyword_s *fnd = lookup_kwd (which.c_str ());
+    operation_s *fnd = lookup_kwd (which.c_str ());
     if (fnd) {
       switch (fnd->opcode) {
-      case OP_PLUS:
-      case OP_NORM:
+      case OPCODE_PLUS:
+      case OPCODE_NORM:
 	rc = do_plus (A, B);
 	break;
-      case OP_NEGATE:
-      case OP_MINUS:
+      case OPCODE_NEGATE:
+      case OPCODE_MINUS:
 	rc = do_minus (A, B);
 	break;
-      case OP_CONJUGATE:
-      case OP_TIMES:
+      case OPCODE_CONJUGATE:
+      case OPCODE_TIMES:
 	rc = do_times (A, B);
 	break;
-      case OP_DIVIDE:
+      case OPCODE_DIVIDE:
 	rc = do_divide (A, B);
 	break;
-      case OP_EQUAL:
+      case OPCODE_EQUAL:
 	rc = do_equal (A, B);
 	break;
-      case OP_NOT_EQUAL: 
+      case OPCODE_NOT_EQUAL: 
 	rc = do_not_equal (A, B);
 	break;
-      case OP_DOT_PRODUCT:
+      case OPCODE_DOT_PRODUCT:
 	rc = do_dot (A, B);
 	break;
-      case OP_CROSS_PRODUCT:
+      case OPCODE_CROSS_PRODUCT:
 	rc = do_cross (A, B);
 	break;
-      case OP_INTERANGLE:
+      case OPCODE_INTERANGLE:
 	rc = do_ang (A, B);
 	break;
-      case OP_XFORM:
+      case OPCODE_XFORM:
 	rc = do_xform (A, B);
 	break;
-      case OP_PLUS_ASSIGN:
-      case OP_MINUS_ASSIGN:
-      case OP_TIMES_ASSIGN:
-      case OP_DIVIDE_ASSIGN:
-      case OP_INVERT:
-      case OP_FORMAT:
+      case OPCODE_INVERT:
+      case OPCODE_FORMAT:
+#if 0
+      case OPCODE_PLUS_ASSIGN:
+      case OPCODE_MINUS_ASSIGN:
+      case OPCODE_TIMES_ASSIGN:
+      case OPCODE_DIVIDE_ASSIGN:
+#endif
 	MORE_ERROR () <<
 	  "No dyadic use of operator: " << which.c_str ();
 	SYNTAX_ERROR;
@@ -755,7 +785,7 @@ get_function_mux(const char * function_name)
 
   if (!dict_initialised) {
     dict_initialised = true;
-    for (int i = 0; i < nr_keys; i++) {
+    for (int i = 0; i < nr_operations; i++) {
       if (dictionary_max <= 3 + dictionary_nxt) {
 	dictionary_max += DICTIONARY_INCR;
 	dictionary =
@@ -763,12 +793,12 @@ get_function_mux(const char * function_name)
 				       dictionary_max *
 				       sizeof (dictionary_ety_s));
       }
-      dictionary[dictionary_nxt].key = keywords[i].keyword;
-      dictionary[dictionary_nxt++].loc = &keywords[i];
-      dictionary[dictionary_nxt].key = keywords[i].abbr;
-      dictionary[dictionary_nxt++].loc = &keywords[i];
-      dictionary[dictionary_nxt].key = keywords[i].symbol;
-      dictionary[dictionary_nxt++].loc = &keywords[i];
+      dictionary[dictionary_nxt].key = operations[i].keyword;
+      dictionary[dictionary_nxt++].loc = &operations[i];
+      dictionary[dictionary_nxt].key = operations[i].abbr;
+      dictionary[dictionary_nxt++].loc = &operations[i];
+      dictionary[dictionary_nxt].key = operations[i].symbol;
+      dictionary[dictionary_nxt++].loc = &operations[i];
     }
     qsort (dictionary, dictionary_nxt, sizeof (dictionary_ety_s),
 	   dictionary_insert_compare);

@@ -44,6 +44,8 @@ include additional function.
 
 #### Monadic
 
+| Opcode | Abbrev | Symbol | Operation       | Description      |
+| ------ | ------ | ------ | --------------- | ---------------- |
 |  5     | 'co'   | '*'    | 'conjugate'     | Conjugation |
 |  6     | 'no'   | '+'    | 'norm'          | Norm (magnitude) |
 |  7     | 'neg'  | '-'    | 'negate'        | Negate |

@@ -27,6 +27,19 @@ include additional function.
 
 ### Quaternion algebra
 
+The following tables list the supported quaternion operations.  Assuming
+the quaternion extension has been loaded with
+
+&nbsp;&nbsp;&nbsp;&nbsp; 'libaplquat.so' ⎕fx 'quat'
+
+the operations can be invoked in any of three forms such as:
+
+-a quat[1] b
+-a quat['pl'] b
+-a quat['+'] b
+-a quat['plus'] b
+
+
 #### Dyadic
 
 | Opcode | Abbrev | Symbol | Operation       | Description      |

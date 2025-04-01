@@ -11,6 +11,9 @@ Quaternions are represented by a 4-element vector:
 
 &nbsp;&nbsp;&nbsp;&nbsp; $[ s\, a_0i\, a_1j\, a_2k]$
 
+where $s$ is a magnitude and $a_0$, $a_1$, and $a_2$ are a vector to which the
+magnitude is applied.
+
 
 
 ~~~

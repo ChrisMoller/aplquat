@@ -1,6 +1,7 @@
 # aplquat
 An APL extension implementing quaternions
 
+~~~
 testquat;a;b;quat
 ⊣'libaplquat.so' ⎕fx 'quat'
  a←quat ⍳4
@@ -62,4 +63,5 @@ testquat;a;b;quat
 
  ⍞←'Multiplication identity  '
  a quat['×'] quat['÷'] a
+ ~~~
 

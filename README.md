@@ -13,9 +13,9 @@ Quaternions are represented by a 4-element vector:
 
 where $s$ is a magnitude and $a_0$, $a_1$, and $a_2$ are a vector to which the
 magnitude is applied.  This has many possible interpretations, but for my
-purposes in computer graphics, a quaternion may represent a position--a
-position space at distance $s$ from the local origin in direction
-$[ a_0\, a_1\, a_2 ]$--or a rotation $s$ around an axis $[ a_0\, a_1\, a_2 ]$.
+purposes in computer graphics, a quaternion may represent a position
+in space at distance $s$ from the local origin in direction
+$[ a_0\, a_1\, a_2 ]$, or a rotation $s$ around an axis $[ a_0\, a_1\, a_2 ]$.
 
 
 

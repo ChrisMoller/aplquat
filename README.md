@@ -25,12 +25,24 @@ be of use in other areas and nothing says the package can't be extended to
 include additional function.
 
 
+### Quaternion algebra
+
+| Opcode | Abbrev | Symbol | Operation   | Description      |
+| ------ | ------ | ------ | ----------- | ---------------- |
+| 10     | 'ne'   | '!='   | 'not_equal' | Not equal        |
+| 5      | 'co'   | '*'    | 'conjugate' | Conjugation      |
+| 1      | 'pl'   | '+'    | 'plus'      | Addition         |
+| 6      | 'no'   | '+'    | 'norm'      | Norm (magnitude) |
+
+
 ### An example
 ~~~
 testquat;a;b;quat
 ⊣'libaplquat.so' ⎕fx 'quat'
+
+⍝ creation:
  a←quat ⍳4
- b←quat 5+⍳4
+ b←6 quat 5+⍳3
 
 ⎕←''
 ⎕←'Dyadics:'

@@ -26,7 +26,6 @@ include additional function.
 
 
 ### An example
-
 ~~~
 testquat;a;b;quat
 ⊣'libaplquat.so' ⎕fx 'quat'

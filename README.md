@@ -17,6 +17,13 @@ purposes in computer graphics, a quaternion may represent a position
 in space at distance $s$ from the local origin in direction
 $[ a_0\, a_1\, a_2 ]$, or a rotation $s$ around an axis $[ a_0\, a_1\, a_2 ]$.
 
+Quaternions have about as many applications as do complex numbers and can be
+found in areas such as special relativity, electromagnetics, quantum
+mechanics, and so on.  This package provides only a subset of quaternion
+algebra I've found useful for what I do, bu I expect even as it is it can
+be of use in areas and nothing says the package can't be extended to apply
+to other areas.
+
 
 
 ~~~

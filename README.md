@@ -27,42 +27,28 @@ include additional function.
 
 ### Quaternion algebra
 
-| Opcode | Abbrev | Symbol | Operation   | Description      |
-| ------ | ------ | ------ | ----------- | ---------------- |
-| 10     | 'ne'   | '!='   | 'not_equal'     | Not equal        |
-|  5     | 'co'   | '*'    | 'conjugate'     | Conjugation      |
-|  1     | 'pl'   | '+'    | 'plus'          | Addition         |
-|  6     | 'no'   | '+'    | 'norm'          | Norm (magnitude)) |
-|  2     | 'mi'   | '-'    | 'minus'         | Subtraction |
-|  7     | 'neg'  | '-'    | 'negate'        | Negate |
-| 14     | 'ang'  | '<'    | 'interangle'    | Internal angle |
-|  9     | 'eq'   | '=='   | 'equal'         | Equal |
-| 15     | 'xform'| '><'   | 'xform'         | Transform |
-| 14     | 'ang'  | '<'    | 'interangle'    | Internal angle |
-|  5     | 'co'   | '*'    | 'conjugate'     | Conjugation |
-| 13     | 'cross'| '○'    | 'cross_product' | Cross product |
-|  4     | 'di'   | '÷'    | 'divide'        | Division |
-| 12     | 'dot'  | '∘'    | 'dot_product'   | Dot product |
-|  9     | 'eq'   | '=='   | 'equal'         | Equal |
-| 11     | 'fmt'  | '⍕'    | 'format'        | Format  (not yet implemented) |
-| 14     | 'ang'  | '<'    | 'interangle'    | Internal angle |
-|  8     | 'inv'  | '÷'    | 'invert'        | Invert |
-|  2     | 'mi'   | '-'    | 'minus'         | Subtraction |
-| 10     | 'ne'   | '!='   | 'not_equal'     | Not equal |
-|  7     | 'neg'  | '-'    | 'negate'        | Negate |
-|  6     | 'no'   | '+'    | 'norm'          | Norm (magnitude) |
-| 10     | 'ne'   | '!='   | 'not_equal'     | Not equal |
+#### Dyadic
+
+| Opcode | Abbrev | Symbol | Operation       | Description      |
+| ------ | ------ | ------ | --------------- | ---------------- |
 |  1     | 'pl'   | '+'    | 'plus'          | Addition |
-|  3     | 'ti'   | '×'    | 'times'         | Multiplication |
-| 15     | 'xform'| '><'   | 'xform'         | Transform |
+|  2     | 'mi'   | '-'    | 'minus'         | Subtraction |
 |  3     | 'ti'   | '×'    | 'times'         | Multiplication |
 |  4     | 'di'   | '÷'    | 'divide'        | Division |
-|  8     | 'inv'  | '÷'    | 'invert'        | Invert |
+|  9     | 'eq'   | '=='   | 'equal'         | Equal |
+| 10     | 'ne'   | '!='   | 'not_equal'     | Not equal |
 | 12     | 'dot'  | '∘'    | 'dot_product'   | Dot product |
-| 11     | 'fmt'  | '⍕'    | 'format'        | Format  (not yet implemented) |
 | 13     | 'cross'| '○'    | 'cross_product' | Cross product |
+| 14     | 'ang'  | '<'    | 'interangle'    | Internal angle |
+| 15     | 'xform'| '><'   | 'xform'         | Transform |
 
+#### Monadic
 
+|  5     | 'co'   | '*'    | 'conjugate'     | Conjugation |
+|  6     | 'no'   | '+'    | 'norm'          | Norm (magnitude) |
+|  7     | 'neg'  | '-'    | 'negate'        | Negate |
+|  8     | 'inv'  | '÷'    | 'invert'        | Invert |
+| 11     | 'fmt'  | '⍕'    | 'format'        | Format  (not yet implemented) |
 
 ### An example
 ~~~

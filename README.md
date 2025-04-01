@@ -21,10 +21,11 @@ Quaternions have about as many applications as do complex numbers and can be
 found in areas such as special relativity, electromagnetics, quantum
 mechanics, and so on.  This package provides only a subset of quaternion
 algebra I've found useful for what I do, bu I expect even as it is it can
-be of use in areas and nothing says the package can't be extended to apply
-to other areas.
+be of use in other areas and nothing says the package can't be extended to
+include additional function.
 
 
+### An example
 
 ~~~
 testquat;a;b;quat

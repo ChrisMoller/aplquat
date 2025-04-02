@@ -32,7 +32,7 @@ the quaternion extension has been loaded with
 
 &nbsp;&nbsp;&nbsp;&nbsp; 'libaplquat.so' ⎕fx 'quat'
 
-the operations can be invoked in any of three forms such as:
+the operations can be invoked in any of these four forms:
 
 - quat[1]
 - quat['pl']
@@ -40,9 +40,6 @@ the operations can be invoked in any of three forms such as:
 - quat['plus']
 
 all of which result in addition.  (Use anything you like instead of 'quat'.)
-
-
-
 
 #### Dyadic
 
@@ -68,6 +65,28 @@ all of which result in addition.  (Use anything you like instead of 'quat'.)
 |  7     | 'neg'  | '-'    | 'negate'        | Negate |
 |  8     | 'inv'  | '÷'    | 'invert'        | Invert |
 | 11     | 'fmt'  | '⍕'    | 'format'        | Format  (not yet implemented) |
+
+## Installation
+
+- ./autogen.sh
+- make
+- sudo make install
+
+Note that the installation process queries apl itself to find the location
+of the APL source code, so the source for the current apl must still be where
+apl said it came from.
+
+### A quaternion C++ library
+
+The basis of this APL extension is a C++ library, libquat.so, which if you're
+interested at
+
+&nbsp;&nbsp;&nbsp;&nbsp; https://github.com/ChrisMoller/libquat
+
+aplquat uses a slightly customised copy of the libquat source so you don't
+have to install the libquat package before installing aplquat.
+
+
 
 ### An example
 ~~~
@@ -135,4 +154,5 @@ testquat;a;b;quat
  ⍞←'Multiplication identity  '
  a quat['×'] quat['÷'] a
  ~~~
+
 

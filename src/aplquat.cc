@@ -96,7 +96,12 @@ static bool
 is_quat (Value_P V)
 {
   bool rc = false;
-
+#if 1
+  if ((V->get_cfirst ()).is_numeric () && !(*V).is_complex (true)) {
+    if (V->get_rank () == 1 && V->element_count () == 4)
+      rc = true;
+  }
+#else
   if ((V->get_cfirst ()).is_numeric () && !(*V).is_complex (true)) {
     if (V->get_rank () == 1 && V->element_count () == 4)
       rc = true;
@@ -110,6 +115,20 @@ is_quat (Value_P V)
     MORE_ERROR () <<
       "Invalid argument.  Must be a real numeric vector.";
     SYNTAX_ERROR;
+  }
+#endif
+  
+  return rc;
+}
+
+static bool
+is_real_scalar (Value_P V)
+{
+  bool rc = false;
+
+  if ((V->get_cfirst ()).is_numeric () && !(*V).is_complex (true)) {
+    if (V->get_rank () == 0 && V->element_count () == 1)
+      rc = true;
   }
   
   return rc;
@@ -457,18 +476,25 @@ do_times (Value_P A, Value_P B)
 {
   Value_P rc = Str0(LOC);
 
-  if (is_quat (A) && is_quat (B)) {
+  if (is_quat (A)) {
     double Av[4];
     quatify (Av, A);
     Quat Aq (Av);
-    
-    double Bv[4];
-    quatify (Bv, B);
-    Quat Bq (Bv);
 
-    Quat S = Aq * Bq;
-    double *v = S.qvec ();
+    Quat S;
     
+    if (is_quat (B)) {
+      double Bv[4];
+      quatify (Bv, B);
+      Quat Bq (Bv);
+      S = Aq * Bq;
+    }
+    else if (is_real_scalar (B)) {
+      double Bv = (B->get_cravel (0)).get_real_value ();
+      S = Aq * Bv;
+    }
+
+    double *v = S.qvec ();    
     Shape shape_Z (4);
     rc = Value_P (shape_Z, LOC);
     for (int i = 0; i < 4; i++) {
@@ -484,18 +510,25 @@ do_divide (Value_P A, Value_P B)
 {
   Value_P rc = Str0(LOC);
 
-  if (is_quat (A) && is_quat (B)) {
+  if (is_quat (A)) {
     double Av[4];
     quatify (Av, A);
     Quat Aq (Av);
-    
-    double Bv[4];
-    quatify (Bv, B);
-    Quat Bq (Bv);
 
-    Quat S = Aq / Bq;
-    double *v = S.qvec ();
+    Quat S;
     
+    if (is_quat (B)) {
+      double Bv[4];
+      quatify (Bv, B);
+      Quat Bq (Bv);
+      S = Aq / Bq;
+    }
+    else if (is_real_scalar (B)) {
+      double Bv = (B->get_cravel (0)).get_real_value ();
+      S = Aq / Bv;
+    }
+
+    double *v = S.qvec ();    
     Shape shape_Z (4);
     rc = Value_P (shape_Z, LOC);
     for (int i = 0; i < 4; i++) {

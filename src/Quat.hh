@@ -75,7 +75,7 @@ public:
   double	qdot (Quat &v);
   Quat		qcross (Quat &v);
   double	qang (Quat &v);
-  Quat		qxform (Quat &v);
+  Quat		qrot (Quat &v);
   
   friend ostream& operator<<(ostream& os, const Quat &v);
 

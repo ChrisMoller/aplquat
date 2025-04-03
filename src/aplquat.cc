@@ -294,14 +294,8 @@ eval_XB(Value_P X, Value_P B, const NativeFunction * caller)
       case OPCODE_DOT_PRODUCT:
       case OPCODE_CROSS_PRODUCT:
       case OPCODE_INTERANGLE:
-      case OPCODE_XFORM:
+      case OPCODE_ROTATE:
       case OPCODE_FORMAT:
-#if 0
-      case OPCODE_PLUS_ASSIGN:
-      case OPCODE_MINUS_ASSIGN:
-      case OPCODE_TIMES_ASSIGN:
-      case OPCODE_DIVIDE_ASSIGN:
-#endif
 	MORE_ERROR () <<
 	  "No monadic use of operator: " << which.c_str ();
 	SYNTAX_ERROR;
@@ -651,7 +645,7 @@ do_ang (Value_P A, Value_P B)
 }
 
 static Value_P
-do_xform (Value_P A, Value_P B)
+do_rotate (Value_P A, Value_P B)
 {
   Value_P rc = Str0(LOC);
 
@@ -664,7 +658,7 @@ do_xform (Value_P A, Value_P B)
     quatify (Bv, B);
     Quat Bq (Bv);
 
-    Quat S = Aq.qxform (Bq);
+    Quat S = Aq.qrot (Bq);
     double *v = S.qvec ();
 
     Shape shape_Z (4);
@@ -726,17 +720,11 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
       case OPCODE_INTERANGLE:
 	rc = do_ang (A, B);
 	break;
-      case OPCODE_XFORM:
-	rc = do_xform (A, B);
+      case OPCODE_ROTATE:
+	rc = do_rotate (A, B);
 	break;
       case OPCODE_INVERT:
       case OPCODE_FORMAT:
-#if 0
-      case OPCODE_PLUS_ASSIGN:
-      case OPCODE_MINUS_ASSIGN:
-      case OPCODE_TIMES_ASSIGN:
-      case OPCODE_DIVIDE_ASSIGN:
-#endif
 	MORE_ERROR () <<
 	  "No dyadic use of operator: " << which.c_str ();
 	SYNTAX_ERROR;

@@ -311,11 +311,12 @@ Quat::qdot (Quat &v)
 }
 
 Quat
-Quat::qxform (Quat &v)
+Quat::qrot (Quat &v)
 {
-  Quat xform = this->qcross (v);
+  Quat u = this->qcross (v);
   double ang = this->qang (v);
-  xform.a = ang;
+  Quat q = Quat (cos (ang), 0, 0, 0) + (u * sin (ang));
+  Quat xform = q * *this * ~q;
   return xform;
 }
 

@@ -54,7 +54,7 @@ all of which result in addition.  (Use anything you like instead of 'quat'.)
 | 12     | 'dot'  | '∘'    | 'dot_product'   | Dot product |
 | 13     | 'cross'| '○'    | 'cross_product' | Cross product |
 | 14     | 'ang'  | '<'    | 'interangle'    | Internal angle |
-| 15     | 'xform'| '><'   | 'xform'         | Transform |
+| 15     | 'ro'   | '⌽'    | 'rotate'        | Rotate |
 
 #### Monadic
 

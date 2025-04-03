@@ -274,7 +274,7 @@ eval_XB(Value_P X, Value_P B, const NativeFunction * caller)
     if (fnd) {
       switch (fnd->opcode) {
       case OPCODE_PLUS:
-      case OPCODE_NORM:
+      case OPCODE_MAGNITUDE:
 	rc = do_norm (B);
 	break;
       case OPCODE_NEGATE:
@@ -691,7 +691,7 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
     if (fnd) {
       switch (fnd->opcode) {
       case OPCODE_PLUS:
-      case OPCODE_NORM:
+      case OPCODE_MAGNITUDE:
 	rc = do_plus (A, B);
 	break;
       case OPCODE_NEGATE:

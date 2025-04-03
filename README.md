@@ -61,7 +61,7 @@ all of which result in addition.  (Use anything you like instead of 'quat'.)
 | Opcode | Abbrev | Symbol | Operation       | Description      |
 | ------ | ------ | ------ | --------------- | ---------------- |
 |  5     | 'co'   | '*'    | 'conjugate'     | Conjugation |
-|  6     | 'no'   | '+'    | 'norm'          | Norm (magnitude) |
+|  6     | 'mag'  | '+'    | 'magnitude'     | Magnitude |
 |  7     | 'neg'  | '-'    | 'negate'        | Negate |
 |  8     | 'inv'  | '÷'    | 'invert'        | Invert |
 | 11     | 'fmt'  | '⍕'    | 'format'        | Format  (not yet implemented) |

@@ -33,7 +33,7 @@ entry(format,        "fmt",    "⍕",  "Format  (not yet implemented)")
 entry(dot_product,   "dot",    "∘",  "Dot product")
 entry(cross_product, "cross",  "○",  "Cross product")
 entry(interangle,    "ang",    "<",  "Internal angle")
-entry(rotate,        "ro",     "⍉",  "Rotate")
+entry(rotate,        "ro",     "⌽",  "Rotate")
 
 `typedef struct {
   const char *keyword;

@@ -703,6 +703,7 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
 	rc = do_times (A, B);
 	break;
       case OPCODE_DIVIDE:
+      case OPCODE_INVERT:
 	rc = do_divide (A, B);
 	break;
       case OPCODE_EQUAL:
@@ -723,7 +724,6 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
       case OPCODE_ROTATE:
 	rc = do_rotate (A, B);
 	break;
-      case OPCODE_INVERT:
       case OPCODE_FORMAT:
 	MORE_ERROR () <<
 	  "No dyadic use of operator: " << which.c_str ();

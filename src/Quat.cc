@@ -135,9 +135,9 @@ Quat::operator*(double v)	// multiply by double
 {
   Quat s;
   s.a = a * v;
-  s.b = b;
-  s.c = c;
-  s.d = d;
+  s.b = b * v;
+  s.c = c * v;
+  s.d = d * v;
   return s;
 }
 
@@ -173,9 +173,9 @@ Quat::operator/(double v)	// divide by double
 {
   Quat s;
   s.a = a / v;
-  s.b = b;
-  s.c = c;
-  s.d = d;
+  s.b = b / v;
+  s.c = c / v;
+  s.d = d / v;
   return s;
 }
 

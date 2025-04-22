@@ -1,19 +1,44 @@
 ⍝ Quat.tc
-⍝ ══════
+⍝ tests from examples in Quaternions for Computer Graphics 2nd Edition
+⍝ by John Vince
+⍝ ═════
+
       'libaplquat.so' ⎕fx 'quat'
 quat
 
       qa←quat 0.5 2 3 ¯4
       qb←quat 0.1 4 5 6
 
+
 ⍝ addition
+
       qa quat['+'] qb
 0.6 6 8 2
       5 quat['+'] 6
 11
 
+
 ⍝ subtraction
+
       qa quat['-'] qb
 0.4 ¯2 ¯2 ¯10
       5 quat['-'] 6
 ¯1
+
+
+⍝ multiplication by scalar
+
+      3 quat['×'] quat 2 3 4 5
+6 9 12 15
+
+
+⍝ conjugate
+
+      quat['*'] quat 2 3 ¯4 5
+2 ¯3 4 ¯5
+
+
+⍝ norm
+
+      quat['+'] quat 1 4 ¯4 ¯4
+7

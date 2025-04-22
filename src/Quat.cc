@@ -26,10 +26,10 @@
 
 Quat::Quat ()
 {
-  a = 0;
-  b = 0;
-  c = 0;
-  d = 0;
+  a = NAN;
+  b = NAN;
+  c = NAN;
+  d = NAN;
 }
 
 Quat::Quat (double ai, double bi, double ci, double di)
@@ -258,6 +258,22 @@ Quat::qvec ()			// convert to array
   v[2] = c;
   v[3] = d;
   return v;
+}
+
+double *
+Quat::qaxis ()			// extract axis component
+{
+  double *v = new double[3];
+  v[0] = b;
+  v[1] = c;
+  v[2] = d;
+  return v;
+}
+
+double
+Quat::qscalar ()		// extract scalar component
+{
+  return a;
 }
 
 #if 0

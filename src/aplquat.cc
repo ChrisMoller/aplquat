@@ -51,6 +51,7 @@ using namespace std;
 class NativeFunction;
 
 extern "C" void * get_function_mux(const char * function_name);
+static bool is_quat (Value_P V);
 
 #include "kwds.h"
 typedef struct {
@@ -61,6 +62,32 @@ dictionary_ety_s *dictionary = NULL;
 int dictionary_max = 0;
 int dictionary_nxt = 0;
 #define DICTIONARY_INCR 64
+
+enum {
+  A_IS_QUAT,
+  B_IS_QUAT
+};
+
+enum {
+  A_IS_QUAT_BIT = 1 << A_IS_QUAT,
+  B_IS_QUAT_BIT = 1 << B_IS_QUAT
+};
+
+enum {
+  OP_SCALAR_SCALAR = 0,
+  OP_SCALAR_QUAT   = B_IS_QUAT_BIT,
+  OP_QUAT_SCALAR   = A_IS_QUAT_BIT,
+  OP_QUAT_QUAT     = A_IS_QUAT_BIT | B_IS_QUAT_BIT
+};
+
+static int
+set_mode (Value_P A, Value_P B)
+{
+  int mode = 0;
+  mode |= is_quat (A) ? A_IS_QUAT_BIT : 0;
+  mode |= is_quat (B) ? B_IS_QUAT_BIT : 0;
+  return mode;
+}
 
 static int
 dictionary_search_compare (const void *a, const void *b)
@@ -83,40 +110,35 @@ lookup_kwd (const char *kwd)
   return op_data;
 }
 
-static void
-quatify (double *vec, Value_P V)
+static Quat
+quatify (Value_P V)
 {
-  bool rc = false;
-  for (int i = 0; i < 4; i++) {
+  double vec[4];
+  for (int i = 0; i < 4; i++) 
     vec[i] = (V->get_cravel (i)).get_real_value ();
-  }
+  return Quat (vec);
+}
+
+static Value_P
+valify (Quat V)
+{
+  double *v = V.qvec ();
+  Shape shape_Z (4);
+  auto rc = Value_P (shape_Z, LOC);
+  for (int i = 0; i < 4; i++)
+    (*rc).set_ravel_Float (i, v[i]);
+  return rc;
 }
 
 static bool
 is_quat (Value_P V)
 {
   bool rc = false;
-#if 1
+
   if ((V->get_cfirst ()).is_numeric () && !(*V).is_complex (true)) {
     if (V->get_rank () == 1 && V->element_count () == 4)
       rc = true;
   }
-#else
-  if ((V->get_cfirst ()).is_numeric () && !(*V).is_complex (true)) {
-    if (V->get_rank () == 1 && V->element_count () == 4)
-      rc = true;
-    else {
-      MORE_ERROR () <<
-	"Invalid argument.  Must be a quaternion";
-      SYNTAX_ERROR;
-    }
-  }
-  else {
-    MORE_ERROR () <<
-      "Invalid argument.  Must be a real numeric vector.";
-    SYNTAX_ERROR;
-  }
-#endif
   
   return rc;
 }
@@ -175,11 +197,7 @@ do_norm (Value_P B)
   Value_P rc = Str0(LOC);
 
   if (is_quat (B)) {
-    double Bv[4];
-    quatify (Bv, B);
-    Quat Bq (Bv);
-
-    double S = +Bq;
+    double S = +quatify (B);
     rc = FloatScalar ((int)S, LOC);
   }
 
@@ -192,18 +210,8 @@ do_negate (Value_P B)
   Value_P rc = Str0(LOC);
 
   if (is_quat (B)) {
-    double Bv[4];
-    quatify (Bv, B);
-    Quat Bq (Bv);
-
-    Quat S = -Bq;
-    double *v = S.qvec ();
-    
-    Shape shape_Z (4);
-    rc = Value_P (shape_Z, LOC);
-    for (int i = 0; i < 4; i++) {
-      (*rc).set_ravel_Float (i, v[i]);
-    }
+    Quat S = -quatify (B);
+    return valify (S);
   }
 
   return rc;  
@@ -215,18 +223,8 @@ do_conjugate (Value_P B)
   Value_P rc = Str0(LOC);
 
   if (is_quat (B)) {
-    double Bv[4];
-    quatify (Bv, B);
-    Quat Bq (Bv);
-
-    Quat S = *Bq;
-    double *v = S.qvec ();
-    
-    Shape shape_Z (4);
-    rc = Value_P (shape_Z, LOC);
-    for (int i = 0; i < 4; i++) {
-      (*rc).set_ravel_Float (i, v[i]);
-    }
+    Quat S = *quatify (B);
+    return valify (S);
   }
 
   return rc;  
@@ -238,18 +236,8 @@ do_invert (Value_P B)
   Value_P rc = Str0(LOC);
 
   if (is_quat (B)) {
-    double Bv[4];
-    quatify (Bv, B);
-    Quat Bq (Bv);
-
-    Quat S = ~Bq;
-    double *v = S.qvec ();
-
-    Shape shape_Z (4);
-    rc = Value_P (shape_Z, LOC);
-    for (int i = 0; i < 4; i++) {
-      (*rc).set_ravel_Float (i, v[i]);
-    }
+    Quat S = ~quatify (B);
+    return valify (S);
   }
 
   return rc;  
@@ -416,23 +404,31 @@ do_plus (Value_P A, Value_P B)
 {
   Value_P rc = Str0(LOC);
 
-  if (is_quat (A) && is_quat (B)) {
-    double Av[4];
-    quatify (Av, A);
-    Quat Aq (Av);
-    
-    double Bv[4];
-    quatify (Bv, B);
-    Quat Bq (Bv);
-
-    Quat S = Aq + Bq;
-    double *v = S.qvec ();
-    
-    Shape shape_Z (4);
-    rc = Value_P (shape_Z, LOC);
-    for (int i = 0; i < 4; i++) {
-      (*rc).set_ravel_Float (i, v[i]);
+  switch (set_mode (A, B)) {
+  case OP_SCALAR_SCALAR:
+    {
+      double Av = (A->get_cravel (0)).get_real_value ();
+      double Bv = (B->get_cravel (0)).get_real_value ();
+      double R = Av + Bv;
+      return FloatScalar (R, LOC);
     }
+    break;
+  case OP_SCALAR_QUAT:
+  case OP_QUAT_SCALAR:
+    {
+      MORE_ERROR () <<
+	"Mismatched arguments.";
+      SYNTAX_ERROR;
+    }
+    break;
+  case OP_QUAT_QUAT:
+    {
+      Quat Aq = quatify (A);
+      Quat Bq = quatify (B);
+      Quat S = Aq + Bq;
+      return valify (S);
+    }
+    break;
   }
 
   return rc;  
@@ -443,23 +439,31 @@ do_minus (Value_P A, Value_P B)
 {
   Value_P rc = Str0(LOC);
 
-  if (is_quat (A) && is_quat (B)) {
-    double Av[4];
-    quatify (Av, A);
-    Quat Aq (Av);
-    
-    double Bv[4];
-    quatify (Bv, B);
-    Quat Bq (Bv);
-
-    Quat S = Aq - Bq;
-    double *v = S.qvec ();
-    
-    Shape shape_Z (4);
-    rc = Value_P (shape_Z, LOC);
-    for (int i = 0; i < 4; i++) {
-      (*rc).set_ravel_Float (i, v[i]);
+  switch (set_mode (A, B)) {
+  case OP_SCALAR_SCALAR:
+    {
+      double Av = (A->get_cravel (0)).get_real_value ();
+      double Bv = (B->get_cravel (0)).get_real_value ();
+      double R = Av - Bv;
+      return FloatScalar (R, LOC);
     }
+    break;
+  case OP_SCALAR_QUAT:
+  case OP_QUAT_SCALAR:
+    {
+      MORE_ERROR () <<
+	"Mismatched arguments.";
+      SYNTAX_ERROR;
+    }
+    break;
+  case OP_QUAT_QUAT:
+    {
+      Quat Aq = quatify (A);
+      Quat Bq = quatify (B);
+      Quat S = Aq - Bq;
+      return valify (S);
+    }
+    break;
   }
 
   return rc;  
@@ -470,30 +474,45 @@ do_times (Value_P A, Value_P B)
 {
   Value_P rc = Str0(LOC);
 
-  if (is_quat (A)) {
-    double Av[4];
-    quatify (Av, A);
-    Quat Aq (Av);
-
-    Quat S;
-    
-    if (is_quat (B)) {
-      double Bv[4];
-      quatify (Bv, B);
-      Quat Bq (Bv);
-      S = Aq * Bq;
+  switch (set_mode (A, B)) {
+  case OP_SCALAR_SCALAR:
+    {
+      if (is_real_scalar (A) && is_real_scalar (B)) {
+	double Av = (A->get_cravel (0)).get_real_value ();
+	double Bv = (B->get_cravel (0)).get_real_value ();
+	double R = Av * Bv;
+	return FloatScalar (R, LOC);
+      }
     }
-    else if (is_real_scalar (B)) {
-      double Bv = (B->get_cravel (0)).get_real_value ();
-      S = Aq * Bv;
+    break;
+  case OP_SCALAR_QUAT:
+    {
+      if (is_real_scalar (A)) {
+	double Av = (A->get_cravel (0)).get_real_value ();
+	Quat Bq = quatify (B);
+	Quat S = Bq * Av;
+	return valify (S);
+      }
     }
-
-    double *v = S.qvec ();    
-    Shape shape_Z (4);
-    rc = Value_P (shape_Z, LOC);
-    for (int i = 0; i < 4; i++) {
-      (*rc).set_ravel_Float (i, v[i]);
+    break;
+  case OP_QUAT_SCALAR:
+    {
+      if (is_real_scalar (B)) {
+	Quat Aq = quatify (A);
+	double Bv = (B->get_cravel (0)).get_real_value ();
+	Quat S = Aq * Bv;
+	return valify (S);
+      }
     }
+    break;
+  case OP_QUAT_QUAT:
+    {
+      Quat Aq = quatify (A);
+      Quat Bq = quatify (B);
+      Quat S = Aq * Bq;
+      return valify (S);
+    }
+    break;
   }
 
   return rc;  
@@ -504,30 +523,45 @@ do_divide (Value_P A, Value_P B)
 {
   Value_P rc = Str0(LOC);
 
-  if (is_quat (A)) {
-    double Av[4];
-    quatify (Av, A);
-    Quat Aq (Av);
-
-    Quat S;
-    
-    if (is_quat (B)) {
-      double Bv[4];
-      quatify (Bv, B);
-      Quat Bq (Bv);
-      S = Aq / Bq;
+  switch (set_mode (A, B)) {
+  case OP_SCALAR_SCALAR:
+    {
+      if (is_real_scalar (A) && is_real_scalar (B)) {
+	double Av = (A->get_cravel (0)).get_real_value ();
+	double Bv = (B->get_cravel (0)).get_real_value ();
+	double R = Av / Bv;
+	return FloatScalar (R, LOC);
+      }
     }
-    else if (is_real_scalar (B)) {
-      double Bv = (B->get_cravel (0)).get_real_value ();
-      S = Aq / Bv;
+    break;
+  case OP_SCALAR_QUAT:
+    {
+      if (is_real_scalar (A)) {
+	double Av = (A->get_cravel (0)).get_real_value ();
+	Quat Bq = quatify (B);
+	Quat S = ~Bq * Av;
+	return valify (S);
+      }
     }
-
-    double *v = S.qvec ();    
-    Shape shape_Z (4);
-    rc = Value_P (shape_Z, LOC);
-    for (int i = 0; i < 4; i++) {
-      (*rc).set_ravel_Float (i, v[i]);
+    break;
+  case OP_QUAT_SCALAR:
+    {
+      if (is_real_scalar (B)) {
+	Quat Aq = quatify (A);
+	double Bv = (B->get_cravel (0)).get_real_value ();
+	Quat S = Aq / Bv;
+	return valify (S);
+      }
     }
+    break;
+  case OP_QUAT_QUAT:
+    {
+      Quat Aq = quatify (A);
+      Quat Bq = quatify (B);
+      Quat S = Aq / Bq;
+      return valify (S);
+    }
+    break;
   }
 
   return rc;  
@@ -538,17 +572,24 @@ do_equal (Value_P A, Value_P B)
 {
   Value_P rc = Str0(LOC);
 
-  if (is_quat (A) && is_quat (B)) {
-    double Av[4];
-    quatify (Av, A);
-    Quat Aq (Av);
-    
-    double Bv[4];
-    quatify (Bv, B);
-    Quat Bq (Bv);
-
-    bool S = Aq == Bq;
-    rc = IntScalar ((int)S, LOC);
+  switch (set_mode (A, B)) {
+  case OP_SCALAR_SCALAR:
+  case OP_SCALAR_QUAT:
+  case OP_QUAT_SCALAR:
+    {
+      MORE_ERROR () <<
+	"Invalid arguments.  Must be quaternions";
+      SYNTAX_ERROR;
+    }
+    break;
+  case OP_QUAT_QUAT:
+    {
+      Quat Aq = quatify (A);
+      Quat Bq = quatify (B);
+      bool S = Aq == Bq;
+      return IntScalar ((int)S, LOC);
+    }
+    break;
   }
 
   return rc;  
@@ -559,17 +600,24 @@ do_not_equal (Value_P A, Value_P B)
 {
   Value_P rc = Str0(LOC);
 
-  if (is_quat (A) && is_quat (B)) {
-    double Av[4];
-    quatify (Av, A);
-    Quat Aq (Av);
-    
-    double Bv[4];
-    quatify (Bv, B);
-    Quat Bq (Bv);
-
-    bool S = Aq != Bq;
-    rc = IntScalar ((int)S, LOC);
+  switch (set_mode (A, B)) {
+  case OP_SCALAR_SCALAR:
+  case OP_SCALAR_QUAT:
+  case OP_QUAT_SCALAR:
+    {
+      MORE_ERROR () <<
+	"Invalid arguments.  Must be quaternions";
+      SYNTAX_ERROR;
+    }
+    break;
+  case OP_QUAT_QUAT:
+    {
+      Quat Aq = quatify (A);
+      Quat Bq = quatify (B);
+      bool S = Aq != Bq;
+      return IntScalar ((int)S, LOC);
+    }
+    break;
   }
 
   return rc;  
@@ -580,17 +628,24 @@ do_dot (Value_P A, Value_P B)
 {
   Value_P rc = Str0(LOC);
 
-  if (is_quat (A) && is_quat (B)) {
-    double Av[4];
-    quatify (Av, A);
-    Quat Aq (Av);
-    
-    double Bv[4];
-    quatify (Bv, B);
-    Quat Bq (Bv);
-
-    double S = Aq.qdot (Bq);
-    rc = FloatScalar ((int)S, LOC);
+  switch (set_mode (A, B)) {
+  case OP_SCALAR_SCALAR:
+  case OP_SCALAR_QUAT:
+  case OP_QUAT_SCALAR:
+    {
+      MORE_ERROR () <<
+	"Invalid arguments.  Must be quaternions";
+      SYNTAX_ERROR;
+    }
+    break;
+  case OP_QUAT_QUAT:
+    {
+      Quat Aq = quatify (A);
+      Quat Bq = quatify (B);
+      double S = Aq.qdot (Bq);
+      return FloatScalar ((int)S, LOC);
+    }
+    break;
   }
 
   return rc;  
@@ -601,23 +656,24 @@ do_cross (Value_P A, Value_P B)
 {
   Value_P rc = Str0(LOC);
 
-  if (is_quat (A) && is_quat (B)) {
-    double Av[4];
-    quatify (Av, A);
-    Quat Aq (Av);
-    
-    double Bv[4];
-    quatify (Bv, B);
-    Quat Bq (Bv);
-
-    Quat S = Aq.qcross (Bq);
-    double *v = S.qvec ();
-
-    Shape shape_Z (4);
-    rc = Value_P (shape_Z, LOC);
-    for (int i = 0; i < 4; i++) {
-      (*rc).set_ravel_Float (i, v[i]);
+  switch (set_mode (A, B)) {
+  case OP_SCALAR_SCALAR:
+  case OP_SCALAR_QUAT:
+  case OP_QUAT_SCALAR:
+    {
+      MORE_ERROR () <<
+	"Invalid arguments.  Must be quaternions";
+      SYNTAX_ERROR;
     }
+    break;
+  case OP_QUAT_QUAT:
+    {
+      Quat Aq = quatify (A);
+      Quat Bq = quatify (B);
+      Quat S = Aq.qcross (Bq);
+      return valify (S);
+    }
+    break;
   }
 
   return rc;  
@@ -628,17 +684,24 @@ do_ang (Value_P A, Value_P B)
 {
   Value_P rc = Str0(LOC);
 
-  if (is_quat (A) && is_quat (B)) {
-    double Av[4];
-    quatify (Av, A);
-    Quat Aq (Av);
-    
-    double Bv[4];
-    quatify (Bv, B);
-    Quat Bq (Bv);
-
-    double S = Aq.qang (Bq);
-    rc = FloatScalar (S, LOC);
+  switch (set_mode (A, B)) {
+  case OP_SCALAR_SCALAR:
+  case OP_SCALAR_QUAT:
+  case OP_QUAT_SCALAR:
+    {
+      MORE_ERROR () <<
+	"Invalid arguments.  Must be quaternions";
+      SYNTAX_ERROR;
+    }
+    break;
+  case OP_QUAT_QUAT:
+    {
+      Quat Aq = quatify (A);
+      Quat Bq = quatify (B);
+      Quat S = Aq.qang (Bq);
+      return valify (S);
+    }
+    break;
   }
 
   return rc;  
@@ -649,23 +712,24 @@ do_rotate (Value_P A, Value_P B)
 {
   Value_P rc = Str0(LOC);
 
-  if (is_quat (A) && is_quat (B)) {
-    double Av[4];
-    quatify (Av, A);
-    Quat Aq (Av);
-    
-    double Bv[4];
-    quatify (Bv, B);
-    Quat Bq (Bv);
-
-    Quat S = Aq.qrot (Bq);
-    double *v = S.qvec ();
-
-    Shape shape_Z (4);
-    rc = Value_P (shape_Z, LOC);
-    for (int i = 0; i < 4; i++) {
-      (*rc).set_ravel_Float (i, v[i]);
+  switch (set_mode (A, B)) {
+  case OP_SCALAR_SCALAR:
+  case OP_SCALAR_QUAT:
+  case OP_QUAT_SCALAR:
+    {
+      MORE_ERROR () <<
+	"Invalid arguments.  Must be quaternions";
+      SYNTAX_ERROR;
     }
+    break;
+  case OP_QUAT_QUAT:
+    {
+      Quat Aq = quatify (A);
+      Quat Bq = quatify (B);
+      Quat S = Aq.qrot (Bq);
+      return valify (S);
+    }
+    break;
   }
 
   return rc;  

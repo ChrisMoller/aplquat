@@ -71,6 +71,8 @@ public:
 
   string	qstr ();		// stringify
   double *      qvec ();		// convert to array
+  double *      qaxis ();		// extract axis component
+  double        qscalar ();		// extract scalar component
 
   double	qdot (Quat &v);
   Quat		qcross (Quat &v);

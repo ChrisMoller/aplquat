@@ -1,0 +1,19 @@
+⍝ Quat.tc
+⍝ ══════
+      'libaplquat.so' ⎕fx 'quat'
+quat
+
+      qa←quat 0.5 2 3 ¯4
+      qb←quat 0.1 4 5 6
+
+⍝ addition
+      qa quat['+'] qb
+0.6 6 8 2
+      5 quat['+'] 6
+11
+
+⍝ subtraction
+      qa quat['-'] qb
+0.4 ¯2 ¯2 ¯10
+      5 quat['-'] 6
+¯1

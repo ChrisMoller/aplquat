@@ -81,3 +81,20 @@ quat
 
       quat['*'] quat 2 3 ¯4 5
 2 ¯3 4 ¯5
+
+⍝ dots and crosses
+
+      (quat 0 0 0 1) quat['dot'] quat 0 0 0 1
+1
+      (quat 0 0 0 1) quat['dot'] quat 0 0 1 0
+0
+      (quat 0 0 0 1) quat['cross'] quat 0 0 0 1
+0 0 0
+      (quat 0 0 0 1) quat['cross'] quat 0 0 1 0
+¯1 0 0
+      (quat 0 0 0 1) quat['cross'] quat 0 1 0 0
+0 1 0
+      (quat 0 0 1 0) quat['cross'] quat 0 1 0 0
+0 0 ¯1
+
+

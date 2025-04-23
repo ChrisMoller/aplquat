@@ -246,6 +246,10 @@ do_invert (Value_P B)
   Value_P rc = Str0(LOC);
 
   if (is_quat (B)) {
+    if (0.0 == +quatify (B)) {		// get norm
+      MORE_ERROR () << "Null quat.";
+      DOMAIN_ERROR;
+    }
     Quat S = ~quatify (B);
     return valify (S);
   }
@@ -537,8 +541,12 @@ do_divide (Value_P A, Value_P B)
   case OP_SCALAR_SCALAR:
     {
       if (is_real_scalar (A) && is_real_scalar (B)) {
-	double Av = (A->get_cravel (0)).get_real_value ();
 	double Bv = (B->get_cravel (0)).get_real_value ();
+	if (0.0 == Bv) {
+	  MORE_ERROR () << "Zero divide.";
+	  DOMAIN_ERROR;
+	}
+	double Av = (A->get_cravel (0)).get_real_value ();
 	double R = Av / Bv;
 	return FloatScalar (R, LOC);
       }
@@ -547,8 +555,12 @@ do_divide (Value_P A, Value_P B)
   case OP_SCALAR_QUAT:
     {
       if (is_real_scalar (A)) {
-	double Av = (A->get_cravel (0)).get_real_value ();
+	if (0.0 == +quatify (B)) {		// get norm
+	  MORE_ERROR () << "Null quat.";
+	  DOMAIN_ERROR;
+	}
 	Quat Bq = quatify (B);
+	double Av = (A->get_cravel (0)).get_real_value ();
 	Quat S = ~Bq * Av;
 	return valify (S);
       }
@@ -557,8 +569,12 @@ do_divide (Value_P A, Value_P B)
   case OP_QUAT_SCALAR:
     {
       if (is_real_scalar (B)) {
-	Quat Aq = quatify (A);
 	double Bv = (B->get_cravel (0)).get_real_value ();
+	if (0.0 == Bv) {
+	  MORE_ERROR () << "Zero divide.";
+	  DOMAIN_ERROR;
+	}
+	Quat Aq = quatify (A);
 	Quat S = Aq / Bv;
 	return valify (S);
       }
@@ -566,8 +582,12 @@ do_divide (Value_P A, Value_P B)
     break;
   case OP_QUAT_QUAT:
     {
-      Quat Aq = quatify (A);
       Quat Bq = quatify (B);
+      if (0.0 == +quatify (B)) {		// get norm
+	MORE_ERROR () << "Null quat.";
+	DOMAIN_ERROR;
+      }
+      Quat Aq = quatify (A);
       Quat S = Aq / Bq;
       return valify (S);
     }

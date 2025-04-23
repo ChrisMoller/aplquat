@@ -302,14 +302,13 @@ Quat::qdot (Quat &a, Quat &b)
   return (a.a * b.a) + (a.b * b.b) + (a.c * b.c) + (a.d * b.d);
 }
 
-Quat
+double *
 Quat::qcross (Quat &a, Quat &b)
 {
-  Quat s;
-  s.a = 0.0;
-  s.b = (a.c * b.d) - (a.d * b.c);
-  s.c = (a.d * b.b) - (a.b * b.d);
-  s.d = (a.b * b.c) - (a.c * b.b);
+  double *v = new double[4];
+  v[0] = (a.c * b.d) - (a.d * b.c);
+  v[1] = (a.d * b.b) - (a.b * b.d);
+  v[2] = (a.b * b.c) - (a.c * b.b);
   return s;
 }
 
@@ -323,27 +322,28 @@ Quat::qang (Quat &a, Quat &b)
 double
 Quat::qdot (Quat &v)
 {
-  return (a * v.a) + (b * v.b) + (c * v.c) + (d * v.d);
+  return (b * v.b) + (c * v.c) + (d * v.d);
 }
 
 Quat
 Quat::qrot (Quat &v)
 {
-  Quat u = this->qcross (v);
+  double *u = this->qcross (v);
   double ang = this->qang (v);
-  Quat q = Quat (cos (ang), 0, 0, 0) + (u * sin (ang));
-  Quat xform = q * *this * ~q;
-  return xform;
+  Quat q = Quat (cos (ang),
+		 u[0] * sin (ang),
+		 u[1] * sin (ang),
+		 u[2] * sin (ang));
+  return q;
 }
 
-Quat
+double *
 Quat::qcross (Quat &v)
 {
-  Quat s;
-  s.a = 0.0;
-  s.b = (c * v.d) - (d * v.c);
-  s.c = (d * v.b) - (b * v.d);
-  s.d = (b * v.c) - (c * v.b);
+  double *s = new double[3];
+  s[0] = (c * v.d) - (d * v.c);
+  s[1] = (d * v.b) - (b * v.d);
+  s[2] = (b * v.c) - (c * v.b);
   return s;
 }
 

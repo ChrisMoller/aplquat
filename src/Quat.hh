@@ -75,7 +75,7 @@ public:
   double        qscalar ();		// extract scalar component
 
   double	qdot (Quat &v);
-  Quat		qcross (Quat &v);
+  double *	qcross (Quat &v);
   double	qang (Quat &v);
   Quat		qrot (Quat &v);
   

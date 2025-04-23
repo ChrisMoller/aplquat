@@ -653,7 +653,7 @@ do_dot (Value_P A, Value_P B)
       Quat Aq = quatify (A);
       Quat Bq = quatify (B);
       double S = Aq.qdot (Bq);
-      return FloatScalar ((int)S, LOC);
+      return FloatScalar (S, LOC);
     }
     break;
   }
@@ -680,8 +680,12 @@ do_cross (Value_P A, Value_P B)
     {
       Quat Aq = quatify (A);
       Quat Bq = quatify (B);
-      Quat S = Aq.qcross (Bq);
-      return valify (S);
+      double *S = Aq.qcross (Bq);
+      Shape shape_Z (3);
+      auto rc = Value_P (shape_Z, LOC);
+      for (int i = 0; i < 3; i++)
+	(*rc).set_ravel_Float (i, S[i]);
+      return rc;
     }
     break;
   }

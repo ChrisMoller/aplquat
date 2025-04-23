@@ -90,11 +90,18 @@ quat
 0
       (quat 0 0 0 1) quat['cross'] quat 0 0 0 1
 0 0 0
-      (quat 0 0 0 1) quat['cross'] quat 0 0 1 0
-¯1 0 0
+
+⍝   i cross j  = k
+      (quat 0 1 0 0) quat['cross'] quat 0 0 1 0
+0 0 1
+
+⍝   j cross k = i
+      (quat 0 0 1 0) quat['cross'] quat 0 0 0 1
+1 0 0
+
+⍝   k cross i = j
       (quat 0 0 0 1) quat['cross'] quat 0 1 0 0
 0 1 0
-      (quat 0 0 1 0) quat['cross'] quat 0 1 0 0
-0 0 ¯1
+
 
 

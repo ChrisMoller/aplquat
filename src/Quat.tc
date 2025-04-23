@@ -103,5 +103,18 @@ quat
       (quat 0 0 0 1) quat['cross'] quat 0 1 0 0
 0 1 0
 
+⍝ rotation
+
+      p←quat 0 0 1 0		⍝ point at 1.0 on y axis
+      theta←90     		⍝ rotation angle 90 degrees
+      q←theta quat['deg'] 1 0 0 	   ⍝ around the x axis
+      q quat['×'] p quat['×'] quat['÷'] q
+0 0 2.22045E¯16 1
+
+      theta←360
+      q←theta quat['deg'] 1 0 0
+      q quat['×'] p quat['×'] quat['÷'] q
+0 0 1 ¯2.44929E¯16
+
 
 

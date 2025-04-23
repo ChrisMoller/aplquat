@@ -52,6 +52,7 @@ class NativeFunction;
 
 extern "C" void * get_function_mux(const char * function_name);
 static bool is_quat (Value_P V);
+static Value_P create_quat (int c_mode, Value_P A, Value_P B);
 
 #include "kwds.h"
 typedef struct {
@@ -78,6 +79,15 @@ enum {
   OP_SCALAR_QUAT   = B_IS_QUAT_BIT,
   OP_QUAT_SCALAR   = A_IS_QUAT_BIT,
   OP_QUAT_QUAT     = A_IS_QUAT_BIT | B_IS_QUAT_BIT
+};
+
+#define R2D(r)  (((r) / M_PI) * 180.0)
+#define D2R(d)  (((d) / 180.0) * M_PI)
+
+enum {
+  CONSTRUCT_RAW,
+  CONSTRUCT_RADIANS,
+  CONSTRUCT_DEGREES
 };
 
 static int
@@ -302,7 +312,7 @@ eval_XB(Value_P X, Value_P B, const NativeFunction * caller)
 }
 
 static Token
-eval_B(Value_P B, const NativeFunction * caller)
+eval_B (Value_P B, const NativeFunction * caller)
 {
   Value_P rc = Str0(LOC);
 
@@ -321,7 +331,7 @@ eval_B(Value_P B, const NativeFunction * caller)
       const ShapeItem B_count = B->element_count();
       if ((B_count >= 1) && B->get_rank () == 1) {
 	switch(B_count) {
-	case 1:
+	case 1:				// set scalar s 0 0 0
 	  {	
 	    Shape shape_Z (4);
 	    rc = Value_P (shape_Z, LOC);
@@ -333,7 +343,7 @@ eval_B(Value_P B, const NativeFunction * caller)
 	  }
 	  break;
 	case 3:
-	  {
+	  {				// set vec 0 i j k
 	    Shape shape_Z (4);
 	    rc = Value_P (shape_Z, LOC);
 	    (*rc).set_ravel_Float (0, 0);
@@ -345,7 +355,7 @@ eval_B(Value_P B, const NativeFunction * caller)
 	  }
 	  break;
 	case 4:
-	  {
+	  {				// set whole thing
 	    Shape shape_Z (4);
 	    rc = Value_P (shape_Z, LOC);
 	    for (int i = 0; i < B_count; i++) {
@@ -357,14 +367,14 @@ eval_B(Value_P B, const NativeFunction * caller)
 	  break;
 	default:
 	  MORE_ERROR () <<
-	    "Invalid vector argument.  Must be length 1, 2, 3.";
+	    "Invalid vector argument.  Must be length 1, 3, or 4.";
 	  SYNTAX_ERROR;
 	}
       }
     }
   }
   if (!is_okay) {
-#if 1
+#if 0
     int prev_opcode = -1;
     for (int i = 1; i < dictionary_nxt; i++) {
       dictionary_ety_s *ety = &dictionary[i];
@@ -735,6 +745,20 @@ do_rotate (Value_P A, Value_P B)
   return rc;  
 }
 
+static Value_P
+do_radians_construct (Value_P A, Value_P B)
+{
+  Value_P rc = create_quat (CONSTRUCT_RADIANS, A, B);
+  return rc;
+}
+
+static Value_P
+do_degrees_construct (Value_P A, Value_P B)
+{
+  Value_P rc = create_quat (CONSTRUCT_DEGREES, A, B);
+  return  rc;
+}
+
 static Token
 eval_AXB(Value_P A, Value_P X, Value_P B,
 	 const NativeFunction * caller)
@@ -788,6 +812,12 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
       case OPCODE_ROTATE:
 	rc = do_rotate (A, B);
 	break;
+      case OPCODE_RADIANS:
+	rc = do_radians_construct (A, B);
+	break;
+      case OPCODE_DEGREES:
+	rc = do_degrees_construct (A, B);
+	break;
       case OPCODE_FORMAT:
 	MORE_ERROR () <<
 	  "No dyadic use of operator: " << which.c_str ();
@@ -806,9 +836,79 @@ eval_AXB(Value_P A, Value_P X, Value_P B,
   return Token(TOK_APL_VALUE1, rc);
 }
 
-static Token
-eval_AB(Value_P A, Value_P B, const NativeFunction * caller)
+static Value_P
+create_quat (int c_mode, Value_P A, Value_P B)
 {
+  Value_P rc = Str0(LOC);
+
+  double scalar = NAN;
+  double vector[3] = {NAN, NAN, NAN};
+  double sa, ca;
+  
+  if (A->is_numeric_scalar() &&
+      !(*A).is_complex (true)) {
+    scalar = (A->get_cscalar ()).get_real_value ();
+    switch (c_mode) {
+    case CONSTRUCT_RAW:
+      ca = scalar;
+      sa = 1.0;
+      break;
+    case CONSTRUCT_RADIANS:
+      {
+	ca = cos (scalar/2.0);
+	sa = sin (scalar/2.0);
+      }
+      break;
+    case CONSTRUCT_DEGREES:
+      {
+	ca = cos (D2R (scalar)/2.0);
+	sa = sin (D2R (scalar)/2.0);
+      }
+      break;
+    }
+  }
+  else {
+    MORE_ERROR () <<
+      "Invalid left argument.  Must be real scalar";
+    SYNTAX_ERROR;
+  }
+  
+  if ((B->get_cfirst ()).is_numeric () && !(*B).is_complex (true)) {
+    if (B->get_rank () == 1 && B->element_count () == 3) {
+      for (int i = 0; i < 3; i++) {
+	vector[i] = (B->get_cravel (i)).get_real_value ();
+      }
+    }
+    else {
+      MORE_ERROR () <<
+	"Invalid right argument.  Must be a length-3 vector.";
+      SYNTAX_ERROR;
+    }
+  }
+  else {
+    MORE_ERROR () <<
+      "Invalid right argument.  Must be real numeric vector.";
+    SYNTAX_ERROR;
+  }
+
+  if (!isnan (scalar) && !isnan (vector[0])) {
+    Shape shape_Z (4);
+    rc = Value_P (shape_Z, LOC);
+    (*rc).set_ravel_Float (0, ca);
+    for (int i = 0; i < 3; i++) {
+      (*rc).set_ravel_Float (i+1, sa * vector[i]);
+    }
+    rc->check_value(LOC);
+  }
+  return rc;
+}
+
+static Token
+eval_AB (Value_P A, Value_P B, const NativeFunction * caller)
+{
+#if 1
+  Value_P rc = create_quat (CONSTRUCT_RAW, A, B);
+#else
   Value_P rc = Str0(LOC);
 
   double scalar = NAN;
@@ -851,6 +951,7 @@ eval_AB(Value_P A, Value_P B, const NativeFunction * caller)
     }
     rc->check_value(LOC);
   }
+#endif
 
   return Token(TOK_APL_VALUE1, rc);
 }
@@ -882,8 +983,10 @@ get_function_mux(const char * function_name)
       dictionary[dictionary_nxt++].loc = &operations[i];
       dictionary[dictionary_nxt].key = operations[i].abbr;
       dictionary[dictionary_nxt++].loc = &operations[i];
-      dictionary[dictionary_nxt].key = operations[i].symbol;
-      dictionary[dictionary_nxt++].loc = &operations[i];
+      if (0 < strlen (operations[i].symbol)) {
+	dictionary[dictionary_nxt].key = operations[i].symbol;
+	dictionary[dictionary_nxt++].loc = &operations[i];
+      }
     }
     qsort (dictionary, dictionary_nxt, sizeof (dictionary_ety_s),
 	   dictionary_insert_compare);

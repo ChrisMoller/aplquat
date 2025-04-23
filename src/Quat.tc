@@ -3,11 +3,36 @@
 ⍝ by John Vince
 ⍝ ═════
 
+      ⎕pp←6
+      
       'libaplquat.so' ⎕fx 'quat'
 quat
 
       qa←quat 0.5 2 3 ¯4
       qb←quat 0.1 4 5 6
+
+⍝ creators
+
+      quat 1 2 3 4
+1 2 3 4
+      quat 1      
+1 0 0 0
+      quat 1 2 3
+0 1 2 3
+      4 quat 1 2 3
+4 1 2 3
+      90 quat['deg'] 1 1 1
+0.707107 0.707107 0.707107 0.707107
+      0 quat['deg'] 1 1 1
+1 0 0 0
+      (○.5) quat['rad'] 1 1 1
+0.707107 0.707107 0.707107 0.707107
+      (○1) quat['rad'] 1 1 1
+6.12323E¯17 1 1 1
+      ((○1) quat['rad'] 1 1 1) quat['='] 180 quat['deg'] 1 1 1
+1
+      ((○1) quat['rad'] 1 1 1) quat['≠'] 180 quat['deg'] 1 1 1
+0
 
 
 ⍝ addition

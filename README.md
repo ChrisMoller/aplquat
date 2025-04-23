@@ -78,7 +78,7 @@ apl said it came from.
 
 ### A quaternion C++ library
 
-The basis of this APL extension is a C++ library, libquat.so, which if you're
+The basis of this APL extension is a C++ library, libaplquat.so, which if you're
 interested at
 
 &nbsp;&nbsp;&nbsp;&nbsp; https://github.com/ChrisMoller/libquat

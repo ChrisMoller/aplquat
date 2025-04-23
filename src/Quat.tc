@@ -8,8 +8,6 @@
       'libaplquat.so' ⎕fx 'quat'
 quat
 
-      qa←quat 0.5 2 3 ¯4
-      qb←quat 0.1 4 5 6
 
 ⍝ creators
 
@@ -35,35 +33,51 @@ quat
 0
 
 
-⍝ addition
+      qa←quat 2 ¯2 3 ¯4
+      qb←quat 1 ¯2 5 ¯6
+
+⍝ addition/subtraction
 
       qa quat['+'] qb
-0.6 6 8 2
-      5 quat['+'] 6
-11
-
-
-⍝ subtraction
-
+3 ¯4 8 ¯10
       qa quat['-'] qb
-0.4 ¯2 ¯2 ¯10
-      5 quat['-'] 6
-¯1
-
-
-⍝ multiplication by scalar
-
-      3 quat['×'] quat 2 3 4 5
-6 9 12 15
-
-
-⍝ conjugate
-
-      quat['*'] quat 2 3 ¯4 5
-2 ¯3 4 ¯5
-
+1 0 ¯2 2
 
 ⍝ norm
 
-      quat['+'] quat 1 4 ¯4 ¯4
-7
+      (quat['+'] qa)*2
+33
+
+⍝ unit norming
+
+      qa quat['÷'] quat['+'] qa
+0.348155 ¯0.348155 0.522233 ¯0.696311
+     quat ['+'] qa quat['÷'] quat['+'] qa
+1
+
+⍝ multiplication/division
+
+     qa quat['×'] qb
+¯41 ¯4 9 ¯20
+      qb quat['×'] qa
+¯41 ¯8 17 ¯12
+      qa quat['×'] qa
+¯25 ¯8 12 ¯16
+      qa quat['×'] 5
+10 ¯10 15 ¯20
+      5 quat['×'] qa
+10 ¯10 15 ¯20
+     qb quat['×'] (qa quat['÷'] qb)
+2 ¯2 3 ¯4
+
+⍝ inverse
+
+      33 quat['×'] quat['÷'] qa
+2 2 ¯3 4
+      qa quat['×'] quat['÷'] qa
+1 0 0 0
+
+⍝ complex conjugate
+
+      quat['*'] quat 2 3 ¯4 5
+2 ¯3 4 ¯5

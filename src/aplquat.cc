@@ -208,7 +208,7 @@ do_norm (Value_P B)
 
   if (is_quat (B)) {
     double S = +quatify (B);
-    rc = FloatScalar ((int)S, LOC);
+    rc = FloatScalar (S, LOC);
   }
 
   return rc;  

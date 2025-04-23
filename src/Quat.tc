@@ -67,8 +67,9 @@ quat
 10 ¯10 15 ¯20
       5 quat['×'] qa
 10 ¯10 15 ¯20
-     qb quat['×'] (qa quat['÷'] qb)
-2 ¯2 3 ¯4
+      (qb quat['÷'] qa) quat['×'] qa
+1 ¯2 5 ¯6
+
 
 ⍝ inverse
 
@@ -110,10 +111,14 @@ quat
       q←theta quat['deg'] 1 0 0 	   ⍝ around the x axis
       q quat['×'] p quat['×'] quat['÷'] q
 0 0 2.22045E¯16 1
+      q quat['×'] p quat['÷'] q
+0 0 2.22045E¯16 1
 
       theta←360
       q←theta quat['deg'] 1 0 0
       q quat['×'] p quat['×'] quat['÷'] q
+0 0 1 ¯2.44929E¯16
+      q quat['×'] p quat['÷'] q
 0 0 1 ¯2.44929E¯16
 
 

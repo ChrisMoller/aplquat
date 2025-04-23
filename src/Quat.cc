@@ -105,13 +105,20 @@ Quat::operator-=(Quat &v)	// subtract-assign
 }
 
 Quat
-Quat::operator*(Quat v)	// multiply
+Quat::operator*(Quat v)	// multiply / product
 {
   Quat s;
+#if 1
+  s.a = (a * v.a) - ((b * v.b) + (c * v.c) + (d * v.d));
+  s.b = ((a * v.b) + (b * v.a) + (c * v.d)) - (d * v.c);
+  s.c = ((a * v.c) + (c * v.a) + (d * v.b)) - (b * v.d);
+  s.d = ((a * v.d) + (b * v.c) + (d * v.a)) - (c * v.b);
+#else
   s.a = (a * v.a) - (b * v.b) - (c * v.c) - (d * v.d);
   s.b = (a * v.b) + (b * v.a) + (c * v.d) - (d * v.c);
   s.c = (a * v.c) - (b * v.d) + (c * v.a) + (d * v.b);
   s.d = (a * v.d) + (b * v.c) - (c * v.b) + (d * v.a);
+#endif
   return s;
 }
 
@@ -155,7 +162,7 @@ Quat
 Quat::operator/(Quat v)	// divide
 {
   Quat s = ~v;			// invert denominator
-  Quat t = s * *this;
+  Quat t = (*this) * s;
   return t;
 }
 
@@ -214,11 +221,11 @@ Quat::operator-()		// negation
 // have made more sense, so I'm using monadic tilde (~)
 // because quaternions have no use for a complement operator
 Quat
-Quat::operator~()		// reciprocal
+Quat::operator~()		// reciprocal / invert
 {
   Quat s;
   double m2 = (a * a) + (b * b) + (c * c) + (d * d);
-  s.a = a/m2;
+  s.a =  a/m2;
   s.b = -b/m2;
   s.c = -c/m2;
   s.d = -d/m2;

@@ -98,9 +98,9 @@ The constructors are:
 - quat a0 a1 a2
 - s quat a0 a1 a23
 
-**quat s a0 a1 a2** just confirms that the values supplied are valid
+**quat s a0 a1 a2** just confirms that the values supplied are valid.
 
-quat s 
+**quat s** creates a quaternion of the form $[ s\, 0\, 0\, 0]$.
 
 
 ### Operators

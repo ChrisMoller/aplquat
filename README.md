@@ -12,12 +12,11 @@ Quaternions are represented by a 4-element vector:
 
 &nbsp;&nbsp;&nbsp;&nbsp; $[ s\, a_0i\, a_1j\, a_2k]$
 
-where $s$ is a magnitude and $a_0$, $a_1$, and $a_2$ are elements of a vector
-to which the magnitude is applied.  This has many possible interpretations,
-but for my purposes in computer graphics, a quaternion may represent a
-position in space at location $[ a_0\, a_1\, a_2 ]$, where the scalar
-component $s$ is zero, or a rotation of $s$ around an axis $[ a_0\, a_1\, a_2
-]$.
+where $s$ is a scalar quantity and $a_0$, $a_1$, and $a_2$ are elements of a
+3-space vector.  This has many possible interpretations, but for my purposes
+in computer graphics, a quaternion may represent either a position in space at
+location $[ a_0\, a_1\, a_2 ]$, where the scalar component $s$ is ignored, or a
+rotation of $s$ around an axis $[ a_0\, a_1\, a_2 ]$.
 
 ### Quaternion algebra
 

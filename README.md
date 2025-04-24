@@ -110,7 +110,7 @@ obvious use for this.
   a_2k]$.  This is typically used as a position quaternion specifying a
   location in 3-space.
   
-**$\theta$ quat['deg'] a0 a1 a2** and **$\theta$ quat['rad'] a0 a1 a2** create
+**&#03b8; quat['deg'] a0 a1 a2** and **$\theta$ quat['rad'] a0 a1 a2** create
 
 
 ### Operators

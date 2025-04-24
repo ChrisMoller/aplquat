@@ -88,12 +88,12 @@ have to install the libquat package before installing aplquat.
 
 
 
-### An example
+### Examples
 
 This package comes with a testcase file, src/Quat.tc, while can serv as
 examples of usage.  Once the package is installed, the tescase can be run with
 
-- apl -T Quat.tc
+- `apl -T Quat.tc'
 
 
 

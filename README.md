@@ -86,9 +86,23 @@ interested at
 aplquat uses a slightly customised copy of the libquat source so you don't
 have to install the libquat package before installing aplquat.
 
+### Constructors
+
+Quaternions are represented in APL as 4-element real numeric vectors, but tis
+package provides "constructors" that created quaternions are valid, i.e., have
+four real numeric elements.  Assuming the library has been ⎕fx-ed as "quat,"
+The constructors are:
+
+- quat s a0 a1 a2
+- quat s
+- quat a0 a1 a2
+- s quat a0 a1 a2
+
 ### Operators
 
-#### +
+#### +  Dyadic Add, Monadic Norm
+
+
 
 ### Examples
 

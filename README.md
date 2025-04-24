@@ -110,7 +110,9 @@ obvious use for this.
   a_2k]$.  This is typically used as a position quaternion specifying a
   location in 3-space.
   
-**&#03b8; quat['deg'] a0 a1 a2** and **$\theta$ quat['rad'] a0 a1 a2** create
+**t quat['deg'] a0 a1 a2** and **t quat['rad'] a0 a1 a2** create rotational
+quaternions of t degrees or radians, respectively, around axis  $[ a_0i\,
+a_1j\,  a_2k]$.
 
 
 ### Operators

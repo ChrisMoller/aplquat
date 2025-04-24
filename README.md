@@ -96,9 +96,12 @@ The constructors are:
 - quat s a0 a1 a2
 - quat s
 - quat a0 a1 a2
-- s quat a0 a1 a23
+- s quat a0 a1 a2
+- s quat['deg'] a0 a1 a2
+- s quat['rad'] a0 a1 a2
 
-**quat s a0 a1 a2** just confirms that the values supplied are valid.
+**quat s a0 a1 a2** and **s quat a0 a1 a23** both creats a completely
+specified quaternion.
 
 **quat s** creates a quaternion of the form $[ s\, 0\, 0\, 0]$.  There's no
 obvious use for this.
@@ -106,6 +109,8 @@ obvious use for this.
 **quat a0 a1 a2** creates a quaternion of the form $[ 0\, a_0i\, a_1j\,
   a_2k]$.  This is typically used as a position quaternion specifying a
   location in 3-space.
+  
+**$\theta$ quat['deg'] a0 a1 a2** and **$\theta$ quat['rad'] a0 a1 a2** create
 
 
 ### Operators

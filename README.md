@@ -4,8 +4,9 @@ APLquat is an APL extension that implements quaternions.
 A quaternion is an extension of a complex number.  A complex number is
 basically a 2-space vector where the elements are real coefficients of
 a pair of orthogonal basis vectors.  Quaternions extend that to 3-space.
-A major difference though is that while complex numbers a cartesian in
-interpretation, quaternions are more akin to a spherical coordinate system.
+Quaternions have many applications--quantum mechanics, kinematics, field
+theory, and so on--but my thing is computer graphics so this extension is
+optimised for that.
 
 Quaternions are represented by a 4-element vector:
 

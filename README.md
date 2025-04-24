@@ -106,13 +106,13 @@ specified quaternion.
 **quat s** creates a quaternion of the form $[ s\, 0\, 0\, 0]$.  There's no
 obvious use for this.
 
-**quat a0 a1 a2** creates a quaternion of the form $[ 0\, a_0i\, a_1j\,
-  a_2k]$.  This is typically used as a position quaternion specifying a
+**quat a0 a1 a2** creates a quaternion of the form $[ 0\, a_0\, a_1\,
+  a_2]$.  This is typically used as a position quaternion specifying a
   location in 3-space.
   
 **t quat['deg'] a0 a1 a2** and **t quat['rad'] a0 a1 a2** create rotational
-quaternions of t degrees or radians, respectively, around axis  $[ a_0i\,
-a_1j\,  a_2k]$.
+quaternions of t degrees or radians, respectively, around axis  $[ a_0\,
+a_1\,  a_2]$.
 
 
 ### Operators

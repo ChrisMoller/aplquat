@@ -898,14 +898,21 @@ create_quat (int c_mode, Value_P A, Value_P B)
   }
   
   if ((B->get_cfirst ()).is_numeric () && !(*B).is_complex (true)) {
+    bool is_non_zero = false;
     if (B->get_rank () == 1 && B->element_count () == 3) {
       for (int i = 0; i < 3; i++) {
 	vector[i] = (B->get_cravel (i)).get_real_value ();
+	if (0.0 != vector[i]) is_non_zero = true;
       }
     }
     else {
       MORE_ERROR () <<
 	"Invalid right argument.  Must be a length-3 vector.";
+      SYNTAX_ERROR;
+    }
+    if (!is_non_zero) {
+      MORE_ERROR () <<
+	"Invalid right argument.  Must not be a null vector.";
       SYNTAX_ERROR;
     }
   }
@@ -919,9 +926,17 @@ create_quat (int c_mode, Value_P A, Value_P B)
     Shape shape_Z (4);
     rc = Value_P (shape_Z, LOC);
     (*rc).set_ravel_Float (0, ca);
-    for (int i = 0; i < 3; i++) {
-      (*rc).set_ravel_Float (i+1, sa * vector[i]);
+    double m2 = 0.0;
+    if (c_mode == CONSTRUCT_RADIANS ||
+	c_mode == CONSTRUCT_DEGREES) {
+      cerr << "is norming c_mode = " << c_mode << endl;
+      for (int i = 0; i < 3; i++)
+	m2 += vector[i] * vector[i];
+      m2 = sqrt (m2);
     }
+    else m2 = 1.0;
+    for (int i = 0; i < 3; i++) 
+      (*rc).set_ravel_Float (i+1, sa * vector[i] / m2);
     rc->check_value(LOC);
   }
   return rc;

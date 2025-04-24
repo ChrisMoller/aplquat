@@ -20,13 +20,13 @@ quat
       4 quat 1 2 3
 4 1 2 3
       90 quat['deg'] 1 1 1
-0.707107 0.707107 0.707107 0.707107
+0.707107 0.408248 0.408248 0.408248
       0 quat['deg'] 1 1 1
 1 0 0 0
       (○.5) quat['rad'] 1 1 1
-0.707107 0.707107 0.707107 0.707107
+0.707107 0.408248 0.408248 0.408248
       (○1) quat['rad'] 1 1 1
-6.12323E¯17 1 1 1
+6.12323E¯17 0.57735 0.57735 0.57735
       ((○1) quat['rad'] 1 1 1) quat['='] 180 quat['deg'] 1 1 1
 1
       ((○1) quat['rad'] 1 1 1) quat['≠'] 180 quat['deg'] 1 1 1
@@ -107,7 +107,7 @@ quat
 
 ⍝ rotation
 
-      p←quat 0 0 1 0		⍝ point at 1.0 on y axis
+      p←quat 0 1 0		⍝ point at 1.0 on y axis
       theta←90     		⍝ rotation angle 90 degrees
       q←theta quat['deg'] 1 0 0 	   ⍝ around the x axis
       q quat['×'] p quat['×'] quat['÷'] q
@@ -124,7 +124,7 @@ quat
 0 0 1 ¯2.44929E¯16
 
 ⍝ spin
-      p←quat 0 0 1 0
+      p←quat 0 1 0
       r45 ← 45 quat['deg'] 1 0 0
       q←r45
       

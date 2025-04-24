@@ -86,12 +86,15 @@ interested at
 aplquat uses a slightly customised copy of the libquat source so you don't
 have to install the libquat package before installing aplquat.
 
+### Operators
 
+#### +
 
 ### Examples
 
-This package comes with a testcase file, src/Quat.tc, while can serv as
-examples of usage.  Once the package is installed, the tescase can be run with
+This package comes with a testcase file, src/Quat.tc, while can serve as
+examples of usage.  Once the package is installed, the tescase can be run
+with:
 
     apl -T Quat.tc
 

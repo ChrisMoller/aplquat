@@ -61,15 +61,20 @@ the operations can be invoked in any of these four forms:
 16  |   'rad'  | ''   |  'radians'       | Radians  |
 17  |   'deg'  | ''   |  'degrees'       | Degrees  |
 
+These operations variously have monadic and dyadic interpretations as
+described below.
+
+
 ## Installation
 
 - ./autogen.sh
 - make
 - sudo make install
 
-Note that the installation process queries apl itself to find the location
-of the APL source code, so the source for the current apl must still be where
-apl said it came from.
+Note that the installation process queries apl itself (`apl --show_src_dir`)
+to find the location of the APL source code, so the source for the current apl
+must still be where apl said it came from.  Alternately, the source path can
+be set with a configure script option --apl-source-dir=<path>.
 
 ### A quaternion C++ library
 
@@ -84,70 +89,11 @@ have to install the libquat package before installing aplquat.
 
 
 ### An example
-~~~
-testquat;a;b;quat
-⊣'libaplquat.so' ⎕fx 'quat'
 
-⍝ creation:
- a←quat ⍳4
- b←6 quat 5+⍳3
+This package comes with a testcase file, src/Quat.tc, while can serv as
+examples of usage.  Once the package is installed, the tescase can be run with
 
-⎕←''
-⎕←'Dyadics:'
-⎕←''
+- apl -T Quat.tc
 
-⍞←'Addition       +  '
- a quat['+'] b        ⍝ addition
- 
- ⍞←'Subtraction    -  '
- a quat['-'] b	      ⍝ subtraction
- 
- ⍞←'Multiplication ×  '
- a quat['×'] b	      ⍝ multiplication
- 
- ⍞←'Division       ÷  '
- a quat['÷'] b	      ⍝ division
- 
- ⍞←'Equality       == '
- a quat['=='] b	      ⍝ equality
- 
- ⍞←'Inequality     != '
- a quat['!='] b	      ⍝ inequality
- 
- ⍞←'Dot product    ∘  '
- a quat['∘'] b	      ⍝ dot product
- 
- ⍞←'Cross product  ○  '
- a quat['○'] b	      ⍝ cross product
- 
- ⍞←'Internal angle ,  '
- a quat['<'] b	      ⍝ interangle
- 
- ⍞←'Transform      >< '
- a quat['><'] b	      ⍝ transform
- 
-⎕←''
-⎕←'Monadics:'
-⎕←''
-
- ⍞←'Norm/Magnitude +  '
- quat['+'] b	      ⍝ norm/magnitude
- 
- ⍞←'Negate         -  '
- quat['-'] b	      ⍝ negate
- 
- ⍞←'Conjugate      *  '
- quat['*'] b	      ⍝ conjugate
- 
- ⍞←'Invert         ÷  '
- quat['÷'] b	      ⍝ invert
-
-⎕←''
-⎕←'Misc:'
-⎕←''
-
- ⍞←'Multiplication identity  '
- a quat['×'] quat['÷'] a
- ~~~
 
 

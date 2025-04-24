@@ -98,6 +98,11 @@ The constructors are:
 - quat a0 a1 a2
 - s quat a0 a1 a23
 
+**quat s a0 a1 a2** just confirms that the values supplied are valid
+
+quat s 
+
+
 ### Operators
 
 #### +  Dyadic Add, Monadic Norm

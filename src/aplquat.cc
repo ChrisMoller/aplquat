@@ -378,7 +378,7 @@ eval_B (Value_P B, const NativeFunction * caller)
     }
   }
   if (!is_okay) {
-#if 0
+#if 1
     int prev_opcode = -1;
     for (int i = 1; i < dictionary_nxt; i++) {
       dictionary_ety_s *ety = &dictionary[i];

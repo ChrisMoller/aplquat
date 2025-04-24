@@ -15,49 +15,47 @@ Quaternions are represented by a 4-element vector:
 where $s$ is a scalar quantity and $a_0$, $a_1$, and $a_2$ are elements of a
 3-space vector.  This has many possible interpretations, but for my purposes
 in computer graphics, a quaternion may represent either a position in space at
-location $[ a_0\, a_1\, a_2 ]$, where the scalar component $s$ is ignored, or a
+location $[ a_0\, a_1\, a_2 ]$ (the scalar component $s$ is ignored), or a
 rotation of $s$ around an axis $[ a_0\, a_1\, a_2 ]$.
 
 ### Quaternion algebra
 
-The following tables list the supported quaternion operations.  Assuming
-the quaternion extension has been loaded with
+There is an algebra associated with quaternions.  They may be added,
+subtracted, multplied, etc, and this package implements what I've found to be
+a useful a subset ofthe possible operations.  The following tables list the
+supported quaternion operations.  Assuming the quaternion extension has been
+loaded with
 
 &nbsp;&nbsp;&nbsp;&nbsp; 'libaplquat.so' ⎕fx 'quat'
 
+(Use anything you like instead of 'quat'.)
+
 the operations can be invoked in any of these four forms:
 
-- quat[1]
-- quat['pl']
-- quat['+']
-- quat['plus']
-
-all of which result in addition.  (Use anything you like instead of 'quat'.)
-
-#### Dyadic
+- quat[1]      	   (i.e., by the opcode)
+- quat['pl']	   (by the abbreviation)
+- quat['+']	   (by the symbol)
+- quat['plus']	   (by the operation name)
 
 | Opcode | Abbrev | Symbol | Operation       | Description      |
 | ------ | ------ | ------ | --------------- | ---------------- |
-|  1     | 'pl'   | '+'    | 'plus'          | Addition |
-|  2     | 'mi'   | '-'    | 'minus'         | Subtraction |
-|  3     | 'ti'   | '×'    | 'times'         | Multiplication |
-|  4     | 'di'   | '÷'    | 'divide'        | Division |
-|  9     | 'eq'   | '=='   | 'equal'         | Equal |
-| 10     | 'ne'   | '!='   | 'not_equal'     | Not equal |
-| 12     | 'dot'  | '∘'    | 'dot_product'   | Dot product |
-| 13     | 'cross'| '○'    | 'cross_product' | Cross product |
-| 14     | 'ang'  | '<'    | 'interangle'    | Internal angle |
-| 15     | 'ro'   | '⌽'    | 'rotate'        | Rotate |
-
-#### Monadic
-
-| Opcode | Abbrev | Symbol | Operation       | Description      |
-| ------ | ------ | ------ | --------------- | ---------------- |
-|  5     | 'co'   | '*'    | 'conjugate'     | Conjugation |
-|  6     | 'mag'  | '+'    | 'magnitude'     | Magnitude |
-|  7     | 'neg'  | '-'    | 'negate'        | Negate |
-|  8     | 'inv'  | '÷'    | 'invert'        | Invert |
-| 11     | 'fmt'  | '⍕'    | 'format'        | Format  (not yet implemented) |
+1   |   'pl'   | '+'  |  'plus'          | Addition  |
+2   |   'mi'   | '-'  |  'minus'         | Subtraction  |
+3   |   'ti'   | '×'  |  'times'         | Multiplication  |
+4   |   'di'   | '÷'  |  'divide'        | Division  |
+5   |   'co'   | '*'  |  'conjugate'     | Conjugation  |
+6   |   'mag'  | '+'  |  'magnitude'     | Norm  |
+7   |   'neg'  | '-'  |  'negate'        | Negate  |
+8   |   'inv'  | '÷'  |  'invert'        | Reciprocal  |
+9   |   'eq'   | '='  |  'equal'         | Equal  |
+10  |   'ne'   | '≠'  |  'not_equal'     | Not equal  |
+11  |   'fmt'  | '⍕'  |  'format'        | Format  (not yet implemented)   |
+12  |   'dot'  | '∘'  |  'dot_product'   | Dot product  |
+13  |   'cross'| '○'  |  'cross_product' | Cross product  |
+14  |   'ang'  | '<'  |  'interangle'    | Internal angle  |
+15  |   'ro'   | '⌽'  |  'rotate'        | Rotate  |
+16  |   'rad'  | ''   |  'radians'       | Radians  |
+17  |   'deg'  | ''   |  'degrees'       | Degrees  |
 
 ## Installation
 

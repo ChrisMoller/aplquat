@@ -57,6 +57,7 @@ quat
 
 ⍝ multiplication/division
 
+⍝ quaternion multiplication is not commutative
      qa quat['×'] qb
 ¯41 ¯4 9 ¯20
       qb quat['×'] qa
@@ -113,6 +114,7 @@ quat
 0 0 2.22045E¯16 1
       q quat['×'] p quat['÷'] q
 0 0 2.22045E¯16 1
+      
 
       theta←360
       q←theta quat['deg'] 1 0 0
@@ -121,5 +123,39 @@ quat
       q quat['×'] p quat['÷'] q
 0 0 1 ¯2.44929E¯16
 
+⍝ spin
+      p←quat 0 0 1 0
+      r45 ← 45 quat['deg'] 1 0 0
+      q←r45
+      
+      q quat['×'] p quat['÷'] q		
+0 0 0.707107 0.707107
 
+      q←r45 quat['×'] q
+      q quat['×'] p quat['÷'] q		
+0 0 ¯2.22045E¯16 1	
+
+      q←r45 quat['×'] q
+      q quat['×'] p quat['÷'] q		
+0 0 ¯0.707107 0.707107
+
+      q←r45 quat['×'] q
+      q quat['×'] p quat['÷'] q		
+0 0 ¯1 ¯2.22045E¯16
+
+      q←r45 quat['×'] q
+      q quat['×'] p quat['÷'] q		
+0 0 ¯0.707107 ¯0.707107
+
+      q←r45 quat['×'] q
+      q quat['×'] p quat['÷'] q		
+0 0 3.33067E¯16 ¯1
+
+      q←r45 quat['×'] q
+      q quat['×'] p quat['÷'] q		
+0 0 0.707107 ¯0.707107
+
+      q←r45 quat['×'] q
+      q quat['×'] p quat['÷'] q		
+0 0 1 3.33067E¯16
 

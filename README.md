@@ -1,30 +1,23 @@
 # aplquat
 APLquat is an APL extension that implements quaternions.
 
-Quaternion are extensions of complex numbers.  A complex number is
-basically a 2-space vector where the elements are real coefficients of
-a pair of orthogonal basis vectors.  Quaternions extend that to 3-space.
-Quaternions have many applications--quantum mechanics, kinematics, field
-theory, and so on--but my thing is computer graphics so this extension is
-optimised for that.  (The extension can, of course, be extended...)
+Quaternion are extensions of complex numbers.  A complex number is basically a
+2-space vector where the elements are real coefficients of a pair of
+orthogonal basis vectors.  Quaternions extend that to 3-space.  Quaternions
+have many applications--quantum mechanics, kinematics, field theory, and so
+on--but my thing is computer graphics so this extension is optimised for that.
+(The extension can, of course, be extended...)
 
 Quaternions are represented by a 4-element vector:
 
 &nbsp;&nbsp;&nbsp;&nbsp; $[ s\, a_0i\, a_1j\, a_2k]$
 
-where $s$ is a magnitude and $a_0$, $a_1$, and $a_2$ are a vector to which the
-magnitude is applied.  This has many possible interpretations, but for my
-purposes in computer graphics, a quaternion may represent a position
-in space at distance $s$ from the local origin in direction
-$[ a_0\, a_1\, a_2 ]$, or a rotation $s$ around an axis $[ a_0\, a_1\, a_2 ]$.
-
-Quaternions have about as many applications as do complex numbers and can be
-found in areas such as special relativity, electromagnetics, quantum
-mechanics, and so on.  This package provides only a subset of quaternion
-algebra I've found useful for what I do, bu I expect even as it is it can
-be of use in other areas and nothing says the package can't be extended to
-include additional function.
-
+where $s$ is a magnitude and $a_0$, $a_1$, and $a_2$ are elements of a vector
+to which the magnitude is applied.  This has many possible interpretations,
+but for my purposes in computer graphics, a quaternion may represent a
+position in space at location $[ a_0\, a_1\, a_2 ]$, where the scalar
+component $s$ is zero, or a rotation of $s$ around an axis $[ a_0\, a_1\, a_2
+]$.
 
 ### Quaternion algebra
 

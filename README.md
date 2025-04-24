@@ -32,10 +32,12 @@ loaded with
 
 the operations can be invoked in any of these four forms:
 
-- quat[1]      	   (i.e., by the opcode)
-- quat['pl']	   (by the abbreviation)
-- quat['+']	   (by the symbol)
-- quat['plus']	   (by the operation name)
+| Form        | Description |
+|-------------|-------------|
+| quat[1]      	|   (by the opcode) |
+| quat['pl']	|   (by the abbreviation) |
+| quat['+']	|   (by the symbol) |
+| quat['plus']	|   (by the operation name) |
 
 | Opcode | Abbrev | Symbol | Operation       | Description      |
 | ------ | ------ | ------ | --------------- | ---------------- |

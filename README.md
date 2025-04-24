@@ -39,6 +39,8 @@ the operations can be invoked in any of these four forms:
 | quat['+']	|   (by the symbol) |
 | quat['plus']	|   (by the operation name) |
 
+(I've found the 'symbol' form to be the most comfortable.)
+
 | Opcode | Abbrev | Symbol | Operation       | Description      |
 | ------ | ------ | ------ | --------------- | ---------------- |
 1   |   'pl'   | '+'  |  'plus'          | Addition  |

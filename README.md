@@ -96,7 +96,7 @@ The constructors are:
 - quat s a0 a1 a2
 - quat s
 - quat a0 a1 a2
-- s quat a0 a1 a2
+- s quat a0 a1 a23
 
 ### Operators
 

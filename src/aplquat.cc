@@ -930,52 +930,7 @@ create_quat (int c_mode, Value_P A, Value_P B)
 static Token
 eval_AB (Value_P A, Value_P B, const NativeFunction * caller)
 {
-#if 1
   Value_P rc = create_quat (CONSTRUCT_RAW, A, B);
-#else
-  Value_P rc = Str0(LOC);
-
-  double scalar = NAN;
-  double vector[3] = {NAN, NAN, NAN};;
-  
-  if (A->is_numeric_scalar() &&
-      !(*A).is_complex (true)) {
-    scalar = (A->get_cscalar ()).get_real_value ();
-  }
-  else {
-    MORE_ERROR () <<
-      "Invalid left argument.  Must be real scalar";
-    SYNTAX_ERROR;
-  }
-  
-  if ((B->get_cfirst ()).is_numeric () && !(*B).is_complex (true)) {
-    if (B->get_rank () == 1 && B->element_count () == 3) {
-      for (int i = 0; i < 3; i++) {
-	vector[i] = (B->get_cravel (i)).get_real_value ();
-      }
-    }
-    else {
-      MORE_ERROR () <<
-	"Invalid right argument.  Must be a length-3 vector.";
-      SYNTAX_ERROR;
-    }
-  }
-  else {
-    MORE_ERROR () <<
-      "Invalid right argument.  Must be real numeric vector.";
-    SYNTAX_ERROR;
-  }
-
-  if (!isnan (scalar) && !isnan (vector[0])) {
-    Shape shape_Z (4);
-    rc = Value_P (shape_Z, LOC);
-    (*rc).set_ravel_Float (0, scalar);
-    for (int i = 0; i < 3; i++) {
-      (*rc).set_ravel_Float (i+1, vector[i]);
-    }
-    rc->check_value(LOC);
-  }
-#endif
 
   return Token(TOK_APL_VALUE1, rc);
 }

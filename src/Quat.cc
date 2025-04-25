@@ -305,7 +305,7 @@ Quat::qdot (Quat &a, Quat &b)
 double *
 Quat::qcross (Quat &a, Quat &b)
 {
-  double *v = new double[4];
+  double *v = new double[3];
   v[0] = (a.c * b.d) - (a.d * b.c);
   v[1] = (a.d * b.b) - (a.b * b.d);
   v[2] = (a.b * b.c) - (a.c * b.b);
@@ -328,16 +328,7 @@ Quat::qdot (Quat &v)
 Quat
 Quat::qrot (Quat &v)
 {
-#if 1
   Quat q =  (*this) * v / (*this);
-#else
-  double *u = this->qcross (v);
-  double ang = this->qang (v);
-  Quat q = Quat (cos (ang),
-		 u[0] * sin (ang),
-		 u[1] * sin (ang),
-		 u[2] * sin (ang));
-#endif
   return q;
 }
 

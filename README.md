@@ -112,7 +112,7 @@ obvious use for this.
   
 **t quat['deg'] a0 a1 a2** and **t quat['rad'] a0 a1 a2** create rotational
 quaternions of t degrees or radians, respectively, around axis  $[ a_0\,
-a_1\,  a_2]$.
+a_1\,  a_2]$. For example (○.25) quat['rad'] 1 2 3
 
 
 ### Operators

@@ -929,7 +929,6 @@ create_quat (int c_mode, Value_P A, Value_P B)
     double m2 = 0.0;
     if (c_mode == CONSTRUCT_RADIANS ||
 	c_mode == CONSTRUCT_DEGREES) {
-      cerr << "is norming c_mode = " << c_mode << endl;
       for (int i = 0; i < 3; i++)
 	m2 += vector[i] * vector[i];
       m2 = sqrt (m2);

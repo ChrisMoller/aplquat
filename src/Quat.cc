@@ -108,17 +108,10 @@ Quat
 Quat::operator*(Quat v)	// multiply / product
 {
   Quat s;
-#if 1
   s.a = (a * v.a) - ((b * v.b) + (c * v.c) + (d * v.d));
   s.b = ((a * v.b) + (b * v.a) + (c * v.d)) - (d * v.c);
   s.c = ((a * v.c) + (c * v.a) + (d * v.b)) - (b * v.d);
   s.d = ((a * v.d) + (b * v.c) + (d * v.a)) - (c * v.b);
-#else
-  s.a = (a * v.a) - (b * v.b) - (c * v.c) - (d * v.d);
-  s.b = (a * v.b) + (b * v.a) + (c * v.d) - (d * v.c);
-  s.c = (a * v.c) - (b * v.d) + (c * v.a) + (d * v.b);
-  s.d = (a * v.d) + (b * v.c) - (c * v.b) + (d * v.a);
-#endif
   return s;
 }
 
@@ -335,12 +328,16 @@ Quat::qdot (Quat &v)
 Quat
 Quat::qrot (Quat &v)
 {
+#if 1
+  Quat q =  (*this) * v / (*this);
+#else
   double *u = this->qcross (v);
   double ang = this->qang (v);
   Quat q = Quat (cos (ang),
 		 u[0] * sin (ang),
 		 u[1] * sin (ang),
 		 u[2] * sin (ang));
+#endif
   return q;
 }
 
